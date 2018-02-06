@@ -1,0 +1,25 @@
+﻿@import "../lib/bootstrap/scss/_functions.scss";
+@import "../lib/bootstrap/scss/_variables.scss";
+@import "../lib/bootstrap/scss/mixins/_breakpoints.scss";
+
+@mixin boot-clip($selector, $breakpoint, $x1, $y1, $x2, $y2) {
+    @include media-breakpoint-up($breakpoint) {
+        #{$selector} {
+            clip: rect($y1 $x2 $y2 $x1);
+        }
+
+        @supports(-webkit-clip-path: inset($y1 $x2 $y2 $x1)) or (clip-path: inset($y1 $x2 $y2 $x1)) {
+            #{$selector} {
+                clip: initial;
+                clip-path: inset($y1 $x2 $y2 $x1);
+                -webkit-clip-path: inset($y1 $x2 $y2 $x1);
+            }
+        }
+    }
+}
+
+@include boot-clip(#profilePicture, xs, 0px, 0px, 100px, 100px);
+@include boot-clip(#profilePicture, sm, 0px, 0px, 200px, 200px);
+@include boot-clip(#profilePicture, md, 0px, 0px, 300px, 300px);
+@include boot-clip(#profilePicture, lg, 0px, 0px, 400px, 400px);
+@include boot-clip(#profilePicture, xl, 0px, 0px, 500px, 500px);
