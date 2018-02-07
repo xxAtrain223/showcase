@@ -11,9 +11,10 @@ using System;
 namespace showcase.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180206050223_UpdateIdentityTables")]
+    partial class UpdateIdentityTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -179,55 +180,6 @@ namespace showcase.Data.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("showcase.Models.Resume", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int?>("CategoryId");
-
-                    b.Property<int?>("CompanyId");
-
-                    b.Property<string>("FileName")
-                        .IsRequired();
-
-                    b.Property<int>("Version");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("CompanyId");
-
-                    b.ToTable("Resumes");
-                });
-
-            modelBuilder.Entity("showcase.Models.ResumeCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Name")
-                        .IsRequired();
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ResumeCategories");
-                });
-
-            modelBuilder.Entity("showcase.Models.ResumeCompany", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Name")
-                        .IsRequired();
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ResumeCompanies");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
@@ -271,17 +223,6 @@ namespace showcase.Data.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("showcase.Models.Resume", b =>
-                {
-                    b.HasOne("showcase.Models.ResumeCategory", "Category")
-                        .WithMany("Resumes")
-                        .HasForeignKey("CategoryId");
-
-                    b.HasOne("showcase.Models.ResumeCompany", "Company")
-                        .WithMany("Resumes")
-                        .HasForeignKey("CompanyId");
                 });
 #pragma warning restore 612, 618
         }

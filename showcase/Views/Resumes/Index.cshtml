@@ -1,0 +1,27 @@
+﻿@model IEnumerable<showcase.Models.ResumeCategory>
+
+@{
+    ViewData["Title"] = "Resumes";
+}
+
+<h2>Resumes</h2>
+
+@foreach (var category in Model)
+{
+    <div class="card text-dark">
+        <div class="card-header">
+            <h1>@category.Name - <a href="~/Resumes/Category/@(category.Name.Replace(" ", ""))" target="_blank">Latest Resume</a></h1>
+        </div>
+        <div class="card-body">
+            TODO: Add field explaining description for each category
+            <hr />
+            <p>All Resumes:</p>
+            <ul>
+                @foreach (var resume in category.Resumes)
+                {
+                <li><a href="~/Resumes/Category/@(category.Name.Replace(" ", ""))/@resume.Version" target="_blank">@category.Name - Version @resume.Version</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+}

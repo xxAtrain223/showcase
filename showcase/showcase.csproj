@@ -5,6 +5,28 @@
     <UserSecretsId>aspnet-showcase-F09B0EFA-58E9-4F82-9EA5-73813B578F19</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20180206051018_AddResumeModels.cs" />
+    <Compile Remove="Data\Migrations\20180206051018_AddResumeModels.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180206051342_AddResumeModels.cs" />
+    <Compile Remove="Data\Migrations\20180206051342_AddResumeModels.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Data\seed\category-alpha-v1.pdf" />
+    <Content Include="Data\seed\category-alpha-v2.pdf" />
+    <Content Include="Data\seed\category-bravo-v1.pdf" />
+    <Content Include="Data\seed\category-bravo-v2.pdf" />
+    <Content Include="Data\seed\category-charlie-v1.pdf" />
+    <Content Include="Data\seed\category-charlie-v2.pdf" />
+    <Content Include="Data\seed\company-delta-v1.pdf" />
+    <Content Include="Data\seed\company-delta-v2.pdf" />
+    <Content Include="Data\seed\company-echo-v1.pdf" />
+    <Content Include="Data\seed\company-echo-v2.pdf" />
+    <Content Include="Data\seed\company-foxtrot-v1.pdf" />
+    <Content Include="Data\seed\company-foxtrot-v2.pdf" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
@@ -19,8 +41,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Models\ResumesViewModels\" />
     <Folder Include="wwwroot\images\" />
     <Folder Include="wwwroot\lib\" />
+    <Folder Include="Data\seed\" />
+    <Folder Include="wwwroot\resumes\" />
   </ItemGroup>
 
 </Project>
