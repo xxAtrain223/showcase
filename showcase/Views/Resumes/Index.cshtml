@@ -8,20 +8,27 @@
 
 @foreach (var category in Model)
 {
-    <div class="card text-dark">
+    <div class="card text-dark my-3">
         <div class="card-header">
             <h1>@category.Name - <a href="~/Resumes/Category/@(category.Name.Replace(" ", ""))" target="_blank">Latest Resume</a></h1>
         </div>
         <div class="card-body">
             TODO: Add field explaining description for each category
-            <hr />
-            <p>All Resumes:</p>
-            <ul>
-                @foreach (var resume in category.Resumes)
-                {
-                <li><a href="~/Resumes/Category/@(category.Name.Replace(" ", ""))/@resume.Version" target="_blank">@category.Name - Version @resume.Version</a></li>
-                }
-            </ul>
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="col-xs-12 col-sm-auto">
+                    <button class="btn btn-primary mb-1" data-toggle="collapse" data-target="#@(category.Name.Replace(" ", ""))Collapse">Show All Versions</button>
+                </div>
+                <div class="col-xs-12 col-sm">
+                    <ul id="@(category.Name.Replace(" ", ""))Collapse" class="collapse mb-0">
+                    @foreach (var resume in category.Resumes)
+                    {
+                        <li><a href="~/Resumes/Category/@(category.Name.Replace(" ", ""))/@resume.Version" target="_blank">@category.Name - Version @resume.Version</a></li>
+                    }
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 }

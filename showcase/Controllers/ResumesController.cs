@@ -47,7 +47,7 @@ namespace showcase.Controllers
             {
                 resume = await db.
                     ResumeCompanies.
-                    Where(c => c.Name.Replace(" ", "") == name).
+                    Where(c => c.Name.Replace(" ", "").ToLower() == name.Replace(" ", "").ToLower()).
                     SelectMany(c => c.Resumes).
                     OrderByDescending(r => r.Version).
                     FirstOrDefaultAsync();
@@ -56,7 +56,7 @@ namespace showcase.Controllers
             {
                 resume = await db.
                     ResumeCompanies.
-                    Where(c => c.Name.Replace(" ", "") == name).
+                    Where(c => c.Name.Replace(" ", "").ToLower() == name.Replace(" ", "").ToLower()).
                     SelectMany(c => c.Resumes).
                     Where(r => r.Version == version).
                     FirstOrDefaultAsync();
@@ -81,7 +81,7 @@ namespace showcase.Controllers
             {
                 resume = await db.
                     ResumeCategories.
-                    Where(c => c.Name.Replace(" ", "") == name).
+                    Where(c => c.Name.Replace(" ", "").ToLower() == name.Replace(" ", "").ToLower()).
                     SelectMany(c => c.Resumes).
                     OrderByDescending(r => r.Version).
                     FirstOrDefaultAsync();
@@ -90,7 +90,7 @@ namespace showcase.Controllers
             {
                 resume = await db.
                     ResumeCategories.
-                    Where(c => c.Name.Replace(" ", "") == name).
+                    Where(c => c.Name.Replace(" ", "").ToLower() == name.Replace(" ", "").ToLower()).
                     SelectMany(c => c.Resumes).
                     Where(r => r.Version == version).
                     FirstOrDefaultAsync();

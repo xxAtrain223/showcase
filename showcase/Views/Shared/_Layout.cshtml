@@ -39,8 +39,23 @@
     <div class="container body-content">
         @RenderBody()
         <hr />
-        <footer class="text-right">
-            <p>&copy; @DateTime.Now.Year - Anthony Stewart</p>
+        <footer>
+            <div class="row">
+                <div class="col">
+                    <div class="text-left">
+                        <span class="d-block d-sm-none">XS</span>
+                        <span class="d-none d-sm-block d-md-none">SM</span>
+                        <span class="d-none d-md-block d-lg-none">MD</span>
+                        <span class="d-none d-lg-block d-xl-none">LG</span>
+                        <span class="d-none d-xl-block">XL</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="text-right">
+                        <p>&copy; @DateTime.Now.Year - Anthony Stewart</p>
+                    </div>
+                </div>
+            </div>
         </footer>
     </div>
 
