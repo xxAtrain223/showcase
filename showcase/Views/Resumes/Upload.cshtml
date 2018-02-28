@@ -1,0 +1,154 @@
+﻿@model showcase.Models.ResumesViewModels.ResumeUploadViewModel
+
+@{
+    ViewData["Title"] = "Upload";
+
+    string categoryValidationClass = "";
+    switch (ViewData.ModelState.GetValidationState("Category"))
+    {
+        case Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid:
+            categoryValidationClass = "is-invalid";
+            break;
+        case Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid:
+            categoryValidationClass = "is-valid";
+            break;
+        default:
+            break;
+    }
+
+    string companyValidationClass = "";
+    switch (ViewData.ModelState.GetValidationState("Company"))
+    {
+        case Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid:
+            companyValidationClass = "is-invalid";
+            break;
+        case Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid:
+            companyValidationClass = "is-valid";
+            break;
+        default:
+            break;
+    }
+
+    string fileValidationClass = "";
+    switch (ViewData.ModelState.GetValidationState("FormFile"))
+    {
+        case Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid:
+            fileValidationClass = "is-invalid";
+            break;
+        case Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid:
+            fileValidationClass = "is-valid";
+            break;
+        default:
+            break;
+    }
+}
+
+@section head {
+    <environment include="Development">
+        <link rel="stylesheet" href="~/css/typeahead.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="~/css/typeahead.min.css" asp-append-version="true" />
+    </environment>
+    <style>
+        .tt-menu {
+            width: 100%;
+        }
+
+        .tt-dataset {
+            max-height: 90px;
+            overflow-y: scroll;
+        }
+
+        .validation-summary-errors ul {
+            margin-bottom: 0;
+        }
+    </style>
+}
+
+<h2>Upload</h2>
+<form action="~/resumes/Upload" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Categories" />
+    <input type="hidden" asp-for="Companies" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            <div class="form-group row">
+                <label asp-for="Category" class="col-sm-2 col-md-4 col-lg-2 col-form-label">Category:</label>
+                <div class="col">
+                    <input asp-for="Category" placeholder="@Html.NameFor(m => m.Category)" class="form-control typeahead @categoryValidationClass" />
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <div class="form-group row">
+                <label asp-for="Company" class="col-sm-2 col-md-4 col-lg-2 col-form-label">Company:</label>
+                <div class="col">
+                    <input asp-for="Company" placeholder="@Html.NameFor(m => m.Company)" class="form-control typeahead @companyValidationClass" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-xs-12 col-sm-2 col-md-2 col-lg-1">
+            <label asp-for="FormFile" class="col-form-label">File:</label>
+        </div>
+        <div class="col">
+            <div class="custom-file">
+                <input asp-for="FormFile" class="custom-file-input @fileValidationClass" accept="application/pdf">
+                <label asp-for="FormFile" class="custom-file-label">Choose file</label>
+            </div>
+            <span asp-validation-for="FormFile" class="invalid-feedback"></span>
+        </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Submit</button>
+</form>
+
+@section scripts {
+    <environment include="Development">
+        <script src="~/js/typeahead.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/js/typeahead.min.js"></script>
+    </environment>
+
+    @*@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}*@
+
+    <script>
+        $(function () {
+            function runTypeahead(selector, name, data) {
+                var bloodhound = new Bloodhound({
+                    datumTokenizer: Bloodhound.tokenizers.whitespace,
+                    queryTokenizer: Bloodhound.tokenizers.whitespace,
+                    local: data
+                });
+
+                $(selector).typeahead({
+                    hint: true,
+                    highlight: true,
+                    minLength: 0
+                },
+                {
+                    name: name,
+                    limit: 10,
+                    source: function (q, sync) {
+                        if (q === '') {
+                            sync(bloodhound.get(data));
+                        }
+                        else {
+                            bloodhound.search(q, sync);
+                        }
+                    }
+                });
+            }
+            
+            runTypeahead("#Category.typeahead", "categories", @Html.Raw(Model.Categories));
+            runTypeahead("#Company.typeahead", "companies", @Html.Raw(Model.Companies));
+        });
+    </script>
+}

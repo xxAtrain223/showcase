@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using showcase.Data;
 using showcase.Models;
+using showcase.Models.ResumesViewModels;
+using Newtonsoft.Json;
 
 namespace showcase.Controllers
 {
@@ -26,6 +28,7 @@ namespace showcase.Controllers
             env = environment;
         }
         
+        [HttpGet]
         public async Task<ActionResult> Index()
         {
             return View(await db.
@@ -36,9 +39,11 @@ namespace showcase.Controllers
                     Name = c.Name,
                     Resumes = c.Resumes.OrderBy(r => r.Version).ToList()
                 }).
+                OrderBy(c => c.Name).
                 ToListAsync());
         }
 
+        [HttpGet]
         public async Task<ActionResult> Company(string name, int? version)
         {
             Resume resume = null;
@@ -73,6 +78,7 @@ namespace showcase.Controllers
             }
         }
         
+        [HttpGet]
         public async Task<ActionResult> Category(string name, int? version)
         {
             Resume resume = null;
@@ -107,53 +113,83 @@ namespace showcase.Controllers
             }
         }
 
-        public ActionResult Upload()
+        [HttpGet]
+        public async Task<ActionResult> Upload()
         {
-            return View();
+            return View(new ResumeUploadViewModel
+            {
+                Categories = JsonConvert.SerializeObject(await db.ResumeCategories.Select(c => c.Name).ToListAsync()),
+                Companies = JsonConvert.SerializeObject(await db.ResumeCompanies.Select(c => c.Name).ToListAsync())
+            });
         }
 
-        public ActionResult Upload(int CategoryId, int CompanyId, IFormFile FormFile)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Upload([Bind("Category,Company,FormFile,Categories,Companies")]ResumeUploadViewModel resume)
         {
-            if ((CategoryId == -1 && CompanyId == -1) ||
-                (CategoryId != -1 && CompanyId != -1))
+            // Check Category XOR Company
+            if (!(String.IsNullOrWhiteSpace(resume.Category) ^
+                String.IsNullOrWhiteSpace(resume.Company)))
             {
-                return BadRequest("Invalid CategoryId and CompanyId");
+                ModelState.AddModelError(string.Empty, "Please input either a category or company name.");
+                ModelState.AddModelError("Category", string.Empty);
+                ModelState.AddModelError("Company", string.Empty);
             }
 
-            if (FormFile.ContentType != "application/pdf")
+            if (resume.FormFile == null)
             {
-                return BadRequest("Invalid File type");
-            }
-
-            ResumeCategory category = null;
-            ResumeCompany company = null;
-
-            if (CategoryId != -1)
-            {
-                category = db.ResumeCategories.Find(CategoryId);
-
-                if (category == null)
-                {
-                    return NotFound("Category not found");
-                }
-            }
-            if (CompanyId != -1)
-            {
-                company = db.ResumeCompanies.Find(CompanyId);
-
-                if (company == null)
-                {
-                    return NotFound("Company not found");
-                }
+                ModelState.AddModelError(string.Empty, "Please select a file.");
             }
             
-            string realPath = String.Format("{0}.pdf", Guid.NewGuid());
-            using (var stream = FormFile.OpenReadStream())
+            // Check file type
+            if (resume.FormFile?.ContentType != "application/pdf")
             {
-                SaveStreamToFile(stream, realPath);
+                ModelState.AddModelError("FormFile", "File should be a PDF.");
             }
 
-            return RedirectToAction("SuccessfullyUploaded");
+            // Check ModelState
+            if (!ModelState.IsValid)
+            {
+                return View(resume);
+            }
+
+            ResumeCategory category = await db.ResumeCategories.Include(c => c.Resumes).Where(c => c.Name == resume.Category).FirstOrDefaultAsync();
+            ResumeCompany company = await db.ResumeCompanies.Include(c => c.Resumes).Where(c => c.Name == resume.Company).FirstOrDefaultAsync();
+
+            if (!String.IsNullOrWhiteSpace(resume.Category) && category == null)
+            {
+                await db.ResumeCategories.AddAsync(new ResumeCategory { Name = resume.Category });
+                await db.SaveChangesAsync();
+                category = await db.ResumeCategories.Include(c => c.Resumes).Where(c => c.Name == resume.Category).FirstOrDefaultAsync();
+            }
+            else if (!String.IsNullOrWhiteSpace(resume.Company) && company == null)
+            {
+                await db.ResumeCompanies.AddAsync(new ResumeCompany { Name = resume.Company });
+                await db.SaveChangesAsync();
+                company = await db.ResumeCompanies.Include(c => c.Resumes).Where(c => c.Name == resume.Company).FirstOrDefaultAsync();
+            }
+
+            string filename = String.Format("{0}.pdf", Guid.NewGuid());
+            using (var stream = resume.FormFile.OpenReadStream())
+            {
+                SaveStreamToFile(stream, String.Format("{0}/resumes/{1}", env.WebRootPath, filename));
+            }
+
+            Resume newResume = new Resume
+            {
+                Category = category,
+                Company = company,
+                FileName = filename,
+                Version = (category?.Resumes?.Count ?? company?.Resumes?.Count) ?? 0
+            };
+
+            db.Resumes.Add(newResume);
+            await db.SaveChangesAsync();
+
+            //HttpContext.Session.SetString("NewResume", JsonConvert.SerializeObject(newResume));
+            HttpContext.Session.Set("NewResume", newResume);
+
+            return RedirectToAction("Uploaded");
         }
 
         private static void SaveStreamToFile(Stream stream, string filepath)
@@ -163,6 +199,14 @@ namespace showcase.Controllers
                 stream.Seek(0, System.IO.SeekOrigin.Begin);
                 stream.CopyTo(fileSystem);
             }
+        }
+
+        [HttpGet]
+        public ActionResult Uploaded()
+        {
+            Resume newResume = HttpContext.Session.Get<Resume>("NewResume");
+            HttpContext.Session.Remove("NewResume");
+            return View(newResume);
         }
 
         /*

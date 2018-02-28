@@ -27,6 +27,28 @@
             "wwwroot/lib/jquery-validation/dist/jquery.validate.js",
             "wwwroot/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js",
             "wwwroot/lib/jquery-validation-unobtrusive-bootstrap/dist/unobtrusive-bootstrap.js"
+        ],
+        "minify": {
+            "enabled": true,
+            "renameLocals": true
+        },
+        "sourceMap": true
+    },
+    {
+        "outputFileName": "wwwroot/js/typeahead.js",
+        "inputFiles": [
+            "wwwroot/lib/typeahead.js/dist/typeahead.bundle.js"
         ]
+    },
+    {
+        "outputFileName": "wwwroot/css/typeahead.css",
+        "inputFiles": [
+            "wwwroot/lib/typeahead.js-bootstrap4/typeaheadjs.css"
+        ],
+        "minify": {
+            "enabled": true,
+            "renameLocals": true
+        },
+        "sourceMap": true
     }
 ]
