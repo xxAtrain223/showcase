@@ -21,20 +21,21 @@ namespace showcase.Controllers
     {
         private readonly ApplicationDbContext db;
         private readonly IHostingEnvironment env;
-        
+
         public ResumesController(ApplicationDbContext context, IHostingEnvironment environment)
         {
             db = context;
             env = environment;
         }
-        
+
         [HttpGet]
         public async Task<ActionResult> Index()
         {
             return View(await db.
                 ResumeCategories.
                 Include(c => c.Resumes).
-                Select(c => new ResumeCategory {
+                Select(c => new ResumeCategory
+                {
                     Id = c.Id,
                     Name = c.Name,
                     Resumes = c.Resumes.OrderBy(r => r.Version).ToList()
@@ -77,7 +78,7 @@ namespace showcase.Controllers
                 return NotFound();
             }
         }
-        
+
         [HttpGet]
         public async Task<ActionResult> Category(string name, int? version)
         {
@@ -104,7 +105,7 @@ namespace showcase.Controllers
 
             if (resume != null)
             {
-                return PhysicalFile(String.Format("{0}/resumes/{1}", env.WebRootPath, resume.FileName), 
+                return PhysicalFile(String.Format("{0}/resumes/{1}", env.WebRootPath, resume.FileName),
                     "application/pdf", String.Format("{0}.v{1}.pdf", name, resume.Version));
             }
             else
@@ -140,7 +141,7 @@ namespace showcase.Controllers
             {
                 ModelState.AddModelError(string.Empty, "Please select a file.");
             }
-            
+
             // Check file type
             if (resume.FormFile?.ContentType != "application/pdf")
             {
@@ -186,7 +187,6 @@ namespace showcase.Controllers
             db.Resumes.Add(newResume);
             await db.SaveChangesAsync();
 
-            //HttpContext.Session.SetString("NewResume", JsonConvert.SerializeObject(newResume));
             HttpContext.Session.Set("NewResume", newResume);
 
             return RedirectToAction("Uploaded");
@@ -201,12 +201,245 @@ namespace showcase.Controllers
             }
         }
 
-        [HttpGet]
         public ActionResult Uploaded()
         {
             Resume newResume = HttpContext.Session.Get<Resume>("NewResume");
-            HttpContext.Session.Remove("NewResume");
             return View(newResume);
+        }
+
+        public ActionResult Manage()
+        {
+            return View();
+        }
+        
+        [HttpPost]
+        [HttpPut]
+        public ActionResult PutCategory(int? id, string name)
+        {
+            if (String.IsNullOrWhiteSpace(name))
+            {
+                return BadRequest("\"name\" is null or whitespace");
+            }
+
+            if (id != null)
+            {
+                ResumeCategory category = db.ResumeCategories.Find(id);
+
+                if (category == null)
+                {
+                    return NotFound();
+                }
+
+                category.Name = name;
+            }
+            else
+            {
+                db.ResumeCategories.Add(new ResumeCategory { Name = name });
+            }
+
+            db.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpGet]
+        public ActionResult GetCategory(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest("\"id\" is null");
+            }
+
+            ResumeCategory category = db.ResumeCategories.
+                Include(c => c.Resumes).
+                Where(c => c.Id == id).
+                FirstOrDefault();
+
+            if (category != null)
+            {
+                return Json(new
+                {
+                    category.Id,
+                    category.Name,
+                    Resumes = category.Resumes.Select(r => new { r.Id, r.Version })
+                });
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpDelete]
+        public ActionResult DeleteCategory(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            
+            ResumeCategory category = db.ResumeCategories.Find(id);
+
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            db.ResumeCategories.Remove(category);
+
+            db.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpGet]
+        public ActionResult GetCategories(int page = 1, int pagesize = 10)
+        {
+            if (page < 1)
+            {
+                return BadRequest("Page is less than 1");
+            }
+
+            if (pagesize < 1)
+            {
+                return BadRequest("Pagesize is less than 1");
+            }
+
+            IList<ResumeCategory> categories = db.ResumeCategories.
+                Include(c => c.Resumes).
+                Skip((page - 1) * pagesize).
+                Take(pagesize).
+                ToList();
+            
+            int numberOfPages = (int)Math.Ceiling((double)db.ResumeCategories.Count() / pagesize);
+            
+            return Json(new
+            {
+                numberOfPages,
+                currentPage = page,
+                Categories = categories.Select(c => new {
+                    c.Id,
+                    c.Name,
+                    Resumes = c.Resumes.
+                        Select(r => new { r.Id, r.Version }).
+                        OrderBy(r => r.Version)
+                })
+            });
+        }
+
+        [HttpPost]
+        [HttpPut]
+        public ActionResult PutCompany(int? id, string name)
+        {
+            if (String.IsNullOrWhiteSpace(name))
+            {
+                return BadRequest("\"name\" is null or whitespace");
+            }
+
+            if (id != null)
+            {
+                ResumeCompany company = db.ResumeCompanies.Find(id);
+
+                if (company == null)
+                {
+                    return NotFound();
+                }
+
+                company.Name = name;
+            }
+            else
+            {
+                db.ResumeCompanies.Add(new ResumeCompany { Name = name });
+            }
+
+            db.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpGet]
+        public ActionResult GetCompany(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest("\"id\" is null");
+            }
+
+            ResumeCompany company = db.ResumeCompanies.
+                Include(c => c.Resumes).
+                Where(c => c.Id == id).
+                FirstOrDefault();
+
+            if (company != null)
+            {
+                return Json(new
+                {
+                    company.Id,
+                    company.Name,
+                    Resumes = company.Resumes.Select(r => new { r.Id, r.Version })
+                });
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpDelete]
+        public ActionResult DeleteCompany(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            ResumeCompany company = db.ResumeCompanies.Find(id);
+
+            if (company == null)
+            {
+                return NotFound();
+            }
+
+            db.ResumeCompanies.Remove(company);
+
+            db.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpGet]
+        public ActionResult GetCompanies(int page = 1, int pagesize = 10)
+        {
+            if (page < 1)
+            {
+                return BadRequest("Page is less than 1");
+            }
+
+            if (pagesize < 1)
+            {
+                return BadRequest("Pagesize is less than 1");
+            }
+
+            IList<ResumeCompany> companies = db.ResumeCompanies.
+                Include(c => c.Resumes).
+                Skip((page - 1) * pagesize).
+                Take(pagesize).
+                ToList();
+
+            int numberOfPages = (int)Math.Ceiling((double)db.ResumeCompanies.Count() / pagesize);
+
+            return Json(new
+            {
+                numberOfPages,
+                currentPage = page,
+                Companies = companies.Select(c => new {
+                    c.Id,
+                    c.Name,
+                    Resumes = c.Resumes.
+                        Select(r => new { r.Id, r.Version }).
+                        OrderBy(r => r.Version)
+                })
+            });
         }
 
         /*

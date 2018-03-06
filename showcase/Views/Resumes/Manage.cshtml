@@ -1,0 +1,506 @@
+﻿@{
+    ViewData["Title"] = "Manage";
+}
+
+@section head {
+    <style>
+        tr td:last-child,
+        tr td:first-child {
+            white-space: nowrap;
+        }
+
+        .borderTop {
+            border-top: 3px solid #dee2e6;
+        }
+    </style>
+}
+
+<h2>Manage</h2>
+
+<section id="categories" class="anchor-fix">
+    <div class="card text-dark my-3">
+        <div class="card-header">
+            <h3>Categories</h3>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <colgroup>
+                    <col width="1%" />
+                    <col width="98%" />
+                    <col width="1%" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="alert alert-danger" role="alert" style="display: none;">
+                <span class="alertText"></span>
+                <button type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+        <div class="card-footer">
+            <nav aria-label="Categories pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item disabled previous">
+                        <a class="page-link" href="#categories" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </li>
+                    @* Page numbers will be inserted here *@
+                    <li class="page-item disabled next">
+                        <a class="page-link" href="#categories" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</section>
+
+<section id="companies" class="anchor-fix">
+    <div class="card text-dark my-3">
+        <div class="card-header">
+            <h3>Companies</h3>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <colgroup>
+                    <col width="99%" />
+                    <col width="1%" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="alert alert-danger" role="alert" style="display: none;">
+                <span class="alertText"></span>
+                <button type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+        <div class="card-footer">
+            <nav aria-label="Categories pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item disabled previous">
+                        <a class="page-link" href="#companies" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </li>
+                    @* Page numbers will be inserted here *@
+                    <li class="page-item disabled next">
+                        <a class="page-link" href="#companies" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</section>
+
+<div class="modal text-dark" id="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modal-title"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+            </div>
+            <div class="modal-footer">
+                <div class="alert alert-danger" role="alert" style="display: none; padding: 6px 12px; margin-bottom: 0px;">
+                    <span class="alertText">fdsa</span>
+                    <button type="button" class="close" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <img src="~/images/loading.gif" id="loading" style="display: none; height: 38px; width: auto;" />
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="modal-accept"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+<script>
+    var pagesize = 5;
+
+    function makeButtons(data, buttons) {
+        var group = $("<div>")
+            .addClass("btn-group btn-group-sm w-100")
+            .attr("role", "group");
+
+        for (var i = 0; i < buttons.length; i++) {
+            var button = $("<button>")
+                .attr("type", "button")
+                .addClass("btn")
+                .addClass(buttons[i].class)
+                .text(buttons[i].text)
+                .on("click", buttons[i].func);
+
+            for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                    button.data(key, data[key]);
+                }
+            }
+
+            group.append(button);
+        }
+
+        return group;
+    }
+
+    function makeGroupRow(group, buttons) {
+        var nameCell = $("<td>")
+            .text(group.name);
+
+        //var emptyCell = $("<td>");
+
+        var buttonsCell = $("<td>")
+            .html(makeButtons({
+                id: group.id,
+                name: group.name
+            }, buttons))
+            .css("padding", ".5rem .75rem");
+
+        return $("<tr>")
+            .addClass("borderTop")
+            .append(nameCell)
+            //.append(emptyCell)
+            .append(buttonsCell);
+    }
+
+    function makeCategoryRow(category) {
+        var row = makeGroupRow(category, [
+            {
+                text: "Rename",
+                class: "btn-warning",
+                func: renameCategoryModal
+            },
+            {
+                text: "Edit Desc.",
+                class: "btn-info",
+                func: editDescriptionModal
+            },
+            {
+                text: "Delete",
+                class: "btn-danger",
+                func: deleteCategoryModal
+            }
+        ]);
+        
+        $("td:first", row).after($("<td>").text("fdas").attr("rowspan", category.resumes.length + 1));
+
+        return row;
+    }
+
+    function makeCompanyRow(company) {
+        return makeGroupRow(company, [
+            {
+                text: "Rename",
+                class: "btn-warning",
+                func: renameCompanyModal
+            },
+            {
+                text: "Delete",
+                class: "btn-danger",
+                func: deleteCompanyModal
+            }
+        ]);
+    }
+
+    function makeResumeRow(resume, categoryCompany, name) {
+        var versionCell = $("<td>")
+            .append($("<a>")
+                .text("Version " + resume.version)
+                .attr("href", "@Url.Content("~/Resumes")/" + categoryCompany + "/" + name.replace(/ /g, "") + "/" + resume.version))
+                .css("padding-left", "2rem");
+
+        var empty = $("<td>");
+
+        var buttons = $("<td>")
+            .html(makeButtons({
+                id: resume.id,
+                version: resume.version
+            }, [{
+                text: "Delete Resume",
+                class: "btn-danger w-100",
+                func: deleteResumeModal
+            }]))
+            .css("padding", ".5rem .75rem");
+
+        var row = $("<tr>");
+        row.append(versionCell);
+        if (categoryCompany == "Category") {
+            //row.append($("<td>"));
+        }
+        row.append(buttons);
+
+        return row;
+    }
+
+    function makePageItem(sectionSelector, i, active) {
+        var pageClass = active ? "active" : "";
+        return $("<li>")
+            .addClass("page-item " + pageClass)
+            .append($("<a>")
+                .text(i)
+                .addClass("page-link")
+                .attr("href", sectionSelector));
+    }
+
+    function makePagination(sectionSelector, data) {
+        $(sectionSelector + " .pagination li").not(".previous").not(".next").empty();
+        $(sectionSelector + " .pagination .previous").addClass("disabled");
+        $(sectionSelector + " .pagination .next").addClass("disabled");
+
+        if (data.numberOfPages > 0) {
+            for (var i = 0; i < data.numberOfPages; i++) {
+                //addPage(i + 1, (i + 1) == data.currentPage);
+                $(sectionSelector + " .pagination li:last").before(makePageItem(sectionSelector, i + 1, (i + 1) == data.currentPage));
+            }
+
+            if (data.currentPage > 1) {
+                $(sectionSelector + " .pagination .previous").removeClass("disabled");
+            }
+
+            if (data.currentPage < data.numberOfPages) {
+                $(sectionSelector + " .pagination .next").removeClass("disabled");
+            }
+        }
+        else {
+            //addPage(1, false);
+            $(sectionSelector + " .pagination li:last").before(makePageItem(sectionSelector, i + 1, (i + 1) == data.currentPage));
+        }
+    }
+
+    function getCategories(page, pagesize) {
+        if (!page) {
+            page = 1;
+        }
+        if (!pagesize) {
+            pagesize = 10;
+        }
+
+        jQuery.ajax({
+            method: "GET",
+            dataType: "json",
+            url: "@Url.Action("GetCategories", "Resumes")",
+            data: {
+                page: page,
+                pagesize: pagesize
+            }
+        })
+        .done(function (data, textStatus, jqXHR) {
+            $("#categories tbody").empty();
+
+            for (var i = 0; i < data.categories.length; i++) {
+                $("#categories tbody").append(makeCategoryRow(data.categories[i]));
+
+                for (var j = 0; j < data.categories[i].resumes.length; j++) {
+                    $("#categories tbody").append(makeResumeRow(data.categories[i].resumes[j], "Category", data.categories[i].name));
+                }
+            }
+
+            makePagination("#categories", data);
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            $("#categories .alertText").text(jqXHR.responseText);
+            $("#categories .alert").slideDown(500);
+        });
+    }
+
+    function getCompanies(page, pagesize) {
+        if (!page) {
+            page = 1;
+        }
+        if (!pagesize) {
+            pagesize = 10;
+        }
+
+        jQuery.ajax({
+            method: "GET",
+            dataType: "json",
+            url: "@Url.Action("GetCompanies", "Resumes")",
+            data: {
+                page: page,
+                pagesize: pagesize
+            }
+        })
+        .done(function (data, textStatus, jqXHR) {
+            $("#companies tbody").empty();
+
+            for (var i = 0; i < data.companies.length; i++) {
+                $("#companies tbody").append(makeCompanyRow(data.companies[i]));
+
+                for (var j = 0; j < data.companies[i].resumes.length; j++) {
+                    $("#companies tbody").append(makeResumeRow(data.companies[i].resumes[j], "Company", data.companies[i].name));
+                }
+            }
+
+            makePagination("#companies", data);
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            $("#companies .alertText").text(jqXHR.responseText);
+            $("#companies .alert").slideDown(500);
+        });
+    }
+
+    function renameCategoryModal() {
+        var id = $(this).data("id");
+        var name = $(this).data("name");
+
+        $("#modal-title")
+            .text("Rename Category");
+        $("#modal-body")
+            .append($("<p>")
+                .text("Renaming category " + name + "."))
+            .append($("<input>")
+                .attr("type", "text")
+                .attr("id", "NewName")
+                .attr("placeholder", "New Name")
+                .addClass("form-control"));
+        $("#modal-accept")
+            .text("Rename")
+            .on("click", function () {
+                var newName = $("#NewName").val();
+
+                $("#modal-accept").attr("disabled", "disabled");
+                $("#loading").show();
+
+                $.ajax({
+                    method: "PUT",
+                    url: "@Url.Action("PutCategory", "Resumes")",
+                    data: {
+                        id: id,
+                        name: newName
+                    }
+                })
+                .done(function (data, textStatus, jqXHR) {
+                    $("#modal").modal("hide");
+                    getCategoriesAuto();
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    $("#modal .alertText").text(jqXHR.responseText);
+                    $("#modal .alert").show();
+                    $("#loading").hide();
+                    $("#modal-accept").removeAttr("disabled");
+                });
+            });
+        $("#modal").modal("show");
+    }
+
+    function editDescriptionModal() {
+        var id = $(this).data("id");
+        console.log("Edit Description: ", id);
+    }
+
+    function deleteCategoryModal() {
+        var id = $(this).data("id");
+        console.log("Delete Category: ", id);
+    }
+
+    function renameCompanyModal() {
+        var id = $(this).data("id");
+        console.log("Delete Resume: ", id);
+    }
+
+    function deleteCompanyModal() {
+        var id = $(this).data("id");
+        console.log("Delete Category: ", id);
+    }
+
+    function deleteResumeModal() {
+        var id = $(this).data("id");
+        console.log("Delete Resume: ", id);
+    }
+
+    $(function () {
+        $("#categories .close, #companies .close").click(function () {
+            $(this).parents(".alert").slideUp(500);
+        });
+
+        $("#modal .close").click(function () {
+            $(this).parents(".alert").hide(500);
+        });
+
+        $("#modal").on("hidden.bs.modal", function () {
+            $("#modal-title").empty();
+            $("#modal-body").empty();
+            $("#modal-accept").text("").off().removeAttr("disabled");
+            $("#loading").hide();
+            $("#modal .alert").hide();
+            $("#modal .alertText").text("");
+        });
+
+        $(".pagination").on("click", "a", function () {
+            var scrollSpeed = 500; // Pixels per second
+
+            var current = $(window).scrollTop();
+            var destination = $($(this).attr("href")).offset().top;
+
+            var time = (current - destination) / scrollSpeed * 1000;
+
+            $('html, body').animate({
+                scrollTop: destination
+            }, time);
+
+            if ($(this).parent().hasClass("previous")) {
+                var currentPage = parseInt($(this).parents(".pagination").children(".active").text());
+
+                if ($(this).parents("#categories").length) {
+                    getCategories(currentPage - 1, pagesize);
+                }
+                else if ($(this).parents("#companies").length) {
+                    getCompanies(currentPage - 1, pagesize);
+                }
+            }
+            else if ($(this).parent().hasClass("next")) {
+                var currentPage = parseInt($(this).parents(".pagination").children(".active").text());
+
+                if ($(this).parents("#categories").length) {
+                    getCategories(currentPage + 1, pagesize);
+                }
+                else if ($(this).parents("#companies").length) {
+                    getCompanies(currentPage + 1, pagesize);
+                }
+            }
+            else {
+                var page = parseInt($(this).text());
+
+                if ($(this).parents("#categories").length) {
+                    getCategories(page, pagesize);
+                }
+                else if ($(this).parents("#companies").length) {
+                    getCompanies(page, pagesize);
+                }
+            }
+
+            return false;
+        });
+
+        getCategories(1, pagesize);
+        getCompanies(1, pagesize);
+    });
+</script>
+}
