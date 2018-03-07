@@ -80,6 +80,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
+        [ActionName("Company")]
         public async Task<ActionResult> Category(string name, int? version)
         {
             Resume resume = null;
@@ -214,6 +215,7 @@ namespace showcase.Controllers
         
         [HttpPost]
         [HttpPut]
+        [ActionName("Category")]
         public ActionResult PutCategory(int? id, string name)
         {
             if (String.IsNullOrWhiteSpace(name))
@@ -227,7 +229,7 @@ namespace showcase.Controllers
 
                 if (category == null)
                 {
-                    return NotFound();
+                    return NotFound("Category not found");
                 }
 
                 category.Name = name;
@@ -243,6 +245,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
+        [ActionName("Category")]
         public ActionResult GetCategory(int? id)
         {
             if (id == null)
@@ -266,24 +269,27 @@ namespace showcase.Controllers
             }
             else
             {
-                return NotFound();
+                return NotFound("Category not found");
             }
         }
 
         [HttpDelete]
+        [ActionName("Category")]
         public ActionResult DeleteCategory(int? id)
         {
             if (id == null)
             {
-                return BadRequest();
+                return BadRequest("\"id\" is null");
             }
             
-            ResumeCategory category = db.ResumeCategories.Find(id);
+            ResumeCategory category = db.ResumeCategories.Include(c => c.Resumes).Where(c => c.Id == id).FirstOrDefault();
 
             if (category == null)
             {
-                return NotFound();
+                return NotFound("Category not found");
             }
+
+            db.Resumes.RemoveRange(category.Resumes);
 
             db.ResumeCategories.Remove(category);
 
@@ -329,6 +335,7 @@ namespace showcase.Controllers
 
         [HttpPost]
         [HttpPut]
+        [ActionName("Company")]
         public ActionResult PutCompany(int? id, string name)
         {
             if (String.IsNullOrWhiteSpace(name))
@@ -342,7 +349,7 @@ namespace showcase.Controllers
 
                 if (company == null)
                 {
-                    return NotFound();
+                    return NotFound("Company not found");
                 }
 
                 company.Name = name;
@@ -358,6 +365,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
+        [ActionName("Company")]
         public ActionResult GetCompany(int? id)
         {
             if (id == null)
@@ -381,24 +389,27 @@ namespace showcase.Controllers
             }
             else
             {
-                return NotFound();
+                return NotFound("Company not found");
             }
         }
 
         [HttpDelete]
+        [ActionName("Company")]
         public ActionResult DeleteCompany(int? id)
         {
             if (id == null)
             {
-                return BadRequest();
+                return BadRequest("\"id\" is null");
             }
 
-            ResumeCompany company = db.ResumeCompanies.Find(id);
+            ResumeCompany company = db.ResumeCompanies.Include(c => c.Resumes).Where(c => c.Id == id).FirstOrDefault();
 
             if (company == null)
             {
-                return NotFound();
+                return NotFound("Company not found");
             }
+
+            db.Resumes.RemoveRange(company.Resumes);
 
             db.ResumeCompanies.Remove(company);
 
@@ -440,6 +451,29 @@ namespace showcase.Controllers
                         OrderBy(r => r.Version)
                 })
             });
+        }
+
+        [HttpDelete]
+        [ActionName("Resume")]
+        public ActionResult DeleteResume(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest("\"id\" is null");
+            }
+
+            Resume resume = db.Resumes.Find(id);
+
+            if (resume == null)
+            {
+                return NotFound("Resume not found");
+            }
+
+            db.Resumes.Remove(resume);
+            
+            db.SaveChanges();
+
+            return Ok();
         }
 
         /*

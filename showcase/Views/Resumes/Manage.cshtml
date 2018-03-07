@@ -208,7 +208,7 @@
                 func: deleteCategoryModal
             }
         ]);
-        
+
         $("td:first", row).after($("<td>").text("fdas").attr("rowspan", category.resumes.length + 1));
 
         return row;
@@ -241,7 +241,7 @@
         var buttons = $("<td>")
             .html(makeButtons({
                 id: resume.id,
-                version: resume.version
+                str: categoryCompany + " version " + resume.version
             }, [{
                 text: "Delete Resume",
                 class: "btn-danger w-100",
@@ -276,7 +276,6 @@
 
         if (data.numberOfPages > 0) {
             for (var i = 0; i < data.numberOfPages; i++) {
-                //addPage(i + 1, (i + 1) == data.currentPage);
                 $(sectionSelector + " .pagination li:last").before(makePageItem(sectionSelector, i + 1, (i + 1) == data.currentPage));
             }
 
@@ -289,9 +288,13 @@
             }
         }
         else {
-            //addPage(1, false);
             $(sectionSelector + " .pagination li:last").before(makePageItem(sectionSelector, i + 1, (i + 1) == data.currentPage));
         }
+    }
+
+    function getCategoriesAuto() {
+        var page = parseInt($("#categories .pagination .active a").text());
+        getCategories(page, pagesize);
     }
 
     function getCategories(page, pagesize) {
@@ -305,6 +308,7 @@
         jQuery.ajax({
             method: "GET",
             dataType: "json",
+            cache: false,
             url: "@Url.Action("GetCategories", "Resumes")",
             data: {
                 page: page,
@@ -330,6 +334,11 @@
         });
     }
 
+    function getCompaniesAuto() {
+        var page = parseInt($("#companies .pagination .active a").text());
+        getCompanies(page, pagesize);
+    }
+
     function getCompanies(page, pagesize) {
         if (!page) {
             page = 1;
@@ -341,6 +350,7 @@
         jQuery.ajax({
             method: "GET",
             dataType: "json",
+            cache: false,
             url: "@Url.Action("GetCompanies", "Resumes")",
             data: {
                 page: page,
@@ -375,6 +385,9 @@
         $("#modal-body")
             .append($("<p>")
                 .text("Renaming category " + name + "."))
+            .append($("<div>")
+                .addClass("alert alert-warning")
+                .text("This will break links you may have given out."))
             .append($("<input>")
                 .attr("type", "text")
                 .attr("id", "NewName")
@@ -390,7 +403,7 @@
 
                 $.ajax({
                     method: "PUT",
-                    url: "@Url.Action("PutCategory", "Resumes")",
+                    url: "@Url.Action("Category", "Resumes")",
                     data: {
                         id: id,
                         name: newName
@@ -401,7 +414,7 @@
                     getCategoriesAuto();
                 })
                 .fail(function (jqXHR, textStatus, errorThrown) {
-                    $("#modal .alertText").text(jqXHR.responseText);
+                    $("#modal .alertText").text(jqXHR.status + ": " + jqXHR.responseText);
                     $("#modal .alert").show();
                     $("#loading").hide();
                     $("#modal-accept").removeAttr("disabled");
@@ -417,22 +430,177 @@
 
     function deleteCategoryModal() {
         var id = $(this).data("id");
-        console.log("Delete Category: ", id);
+        var name = $(this).data("name");
+
+        $("#modal-title")
+            .text("Delete Category");
+        $("#modal-body")
+            .append($("<p>")
+                .text("Deleting category " + name + "."))
+            .append($("<div>")
+                .addClass("alert alert-danger")
+                .text("This will delete this category and all of its resumes."));
+        $("#modal-accept")
+            .text("Delete")
+            .removeClass("btn-primary")
+            .addClass("btn-danger")
+            .on("click", function () {
+                $("#modal-accept").attr("disabled", "disabled");
+                $("#loading").show();
+
+                $.ajax({
+                    method: "DELETE",
+                    url: "@Url.Action("Category", "Resumes")",
+                    data: {
+                        id: id
+                    }
+                })
+                .done(function (data, textStatus, jqXHR) {
+                    $("#modal").modal("hide");
+                    getCategoriesAuto();
+                })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                    $("#modal .alertText").text(jqXHR.status + ": " + jqXHR.responseText);
+                    $("#modal .alert").show();
+                    $("#loading").hide();
+                    $("#modal-accept").removeAttr("disabled");
+                });
+            });
+        $("#modal").modal("show");
     }
 
     function renameCompanyModal() {
         var id = $(this).data("id");
-        console.log("Delete Resume: ", id);
+        var name = $(this).data("name");
+
+        $("#modal-title")
+            .text("Rename Company");
+        $("#modal-body")
+            .append($("<p>")
+                .text("Renaming company " + name + "."))
+            .append($("<div>")
+                .addClass("alert alert-warning")
+                .text("This will break links you may have given out."))
+            .append($("<input>")
+                .attr("type", "text")
+                .attr("id", "NewName")
+                .attr("placeholder", "New Name")
+                .addClass("form-control"));
+        $("#modal-accept")
+            .text("Rename")
+            .on("click", function () {
+                var newName = $("#NewName").val();
+
+                $("#modal-accept").attr("disabled", "disabled");
+                $("#loading").show();
+
+                $.ajax({
+                    method: "PUT",
+                    url: "@Url.Action("Company", "Resumes")",
+                    data: {
+                        id: id,
+                        name: newName
+                    }
+                })
+                .done(function (data, textStatus, jqXHR) {
+                    $("#modal").modal("hide");
+                    getCompaniesAuto();
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    $("#modal .alertText").text(jqXHR.status + ": " + jqXHR.responseText);
+                    $("#modal .alert").show();
+                    $("#loading").hide();
+                    $("#modal-accept").removeAttr("disabled");
+                });
+            });
+        $("#modal").modal("show");
     }
 
     function deleteCompanyModal() {
         var id = $(this).data("id");
-        console.log("Delete Category: ", id);
+        var name = $(this).data("name");
+
+        $("#modal-title")
+            .text("Delete Company");
+        $("#modal-body")
+            .append($("<p>")
+                .text("Deleting company " + name + "."))
+            .append($("<div>")
+                .addClass("alert alert-danger")
+                .text("This will delete this company and all of its resumes."));
+        $("#modal-accept")
+            .text("Delete")
+            .removeClass("btn-primary")
+            .addClass("btn-danger")
+            .on("click", function () {
+                $("#modal-accept").attr("disabled", "disabled");
+                $("#loading").show();
+
+                $.ajax({
+                    method: "DELETE",
+                    url: "@Url.Action("Company", "Resumes")",
+                    data: {
+                        id: id
+                    }
+                })
+                .done(function (data, textStatus, jqXHR) {
+                    $("#modal").modal("hide");
+                    getCompaniesAuto();
+                })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                    $("#modal .alertText").text(jqXHR.status + ": " + jqXHR.responseText);
+                    $("#modal .alert").show();
+                    $("#loading").hide();
+                    $("#modal-accept").removeAttr("disabled");
+                });
+            });
+        $("#modal").modal("show");
     }
 
     function deleteResumeModal() {
         var id = $(this).data("id");
-        console.log("Delete Resume: ", id);
+        var str = $(this).data("str");
+
+        $("#modal-title")
+            .text("Delete Resume");
+        $("#modal-body")
+            .append($("<p>")
+                .text("Deleting " + str + "."))
+            .append($("<div>")
+                .addClass("alert alert-info")
+                .text("Requests for this resume will be forwarded to the next version."));
+        $("#modal-accept")
+            .text("Delete")
+            .removeClass("btn-primary")
+            .addClass("btn-danger")
+            .on("click", function () {
+                $("#modal-accept").attr("disabled", "disabled");
+                $("#loading").show();
+
+                $.ajax({
+                    method: "DELETE",
+                    url: "@Url.Action("Resume", "Resumes")",
+                    data: {
+                        id: id
+                    },
+                    categoryCompany: str.substr(0, str.indexOf(" "))
+                })
+                .done(function (data, textStatus, jqXHR) {
+                    $("#modal").modal("hide");
+                    if (this.categoryCompany == "Category") {
+                        getCategoriesAuto();
+                    } else if (this.categoryCompany == "Company") {
+                        getCompaniesAuto();
+                    }
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    $("#modal .alertText").text(jqXHR.status + ": " + jqXHR.responseText);
+                    $("#modal .alert").show();
+                    $("#loading").hide();
+                    $("#modal-accept").removeAttr("disabled");
+                });
+            });
+        $("#modal").modal("show");
     }
 
     $(function () {
@@ -447,7 +615,8 @@
         $("#modal").on("hidden.bs.modal", function () {
             $("#modal-title").empty();
             $("#modal-body").empty();
-            $("#modal-accept").text("").off().removeAttr("disabled");
+            $("#modal-accept").text("").off().removeAttr("disabled")
+                .removeClass().addClass("btn btn-primary");
             $("#loading").hide();
             $("#modal .alert").hide();
             $("#modal .alertText").text("");
