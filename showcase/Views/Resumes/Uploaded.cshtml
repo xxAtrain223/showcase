@@ -9,11 +9,11 @@
     The resume was successfully uploaded to
     @if (Model.Category != null)
     {
-        <a href="~/Resumes/Category/@(Model.Category.Name.Replace(" ", ""))/@Model.Version" target="_blank" class="alert-link">@Model.Category.Name - Version @Model.Version</a>
+        <a href="~/Resume/Category/@(Model.Category.Name.Replace(" ", ""))/@Model.Version" target="_blank" class="alert-link">@Model.Category.Name - Version @Model.Version</a>
     }
     else if (Model.Company != null)
     {
-        <a href="~/Resumes/Company/@(Model.Company.Name.Replace(" ", ""))/@Model.Version" target="_blank" class="alert-link">@Model.Company.Name - Version @Model.Version</a>
+        <a href="~/Resume/Company/@(Model.Company.Name.Replace(" ", ""))/@Model.Version" target="_blank" class="alert-link">@Model.Company.Name - Version @Model.Version</a>
     }
     else
     {

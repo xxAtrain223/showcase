@@ -164,6 +164,14 @@
                 }
             }
 
+            if (buttons[i].hasOwnProperty("data")) {
+                for (var key in buttons[i].data) {
+                    if (buttons[i].data.hasOwnProperty(key)) {
+                        button.data(key, buttons[i].data[key]);
+                    }
+                }
+            }
+
             group.append(button);
         }
 
@@ -173,9 +181,7 @@
     function makeGroupRow(group, buttons) {
         var nameCell = $("<td>")
             .text(group.name);
-
-        //var emptyCell = $("<td>");
-
+        
         var buttonsCell = $("<td>")
             .html(makeButtons({
                 id: group.id,
@@ -186,7 +192,6 @@
         return $("<tr>")
             .addClass("borderTop")
             .append(nameCell)
-            //.append(emptyCell)
             .append(buttonsCell);
     }
 
@@ -200,7 +205,8 @@
             {
                 text: "Edit Desc.",
                 class: "btn-info",
-                func: editDescriptionModal
+                func: editCategoryDescriptionModal,
+                data: { description: $("<div>").append(category.description).text() }
             },
             {
                 text: "Delete",
@@ -209,7 +215,7 @@
             }
         ]);
 
-        $("td:first", row).after($("<td>").text("fdas").attr("rowspan", category.resumes.length + 1));
+        $("td:first", row).after($("<td>").html(category.description).attr("rowspan", category.resumes.length + 1));
 
         return row;
     }
@@ -233,7 +239,7 @@
         var versionCell = $("<td>")
             .append($("<a>")
                 .text("Version " + resume.version)
-                .attr("href", "@Url.Content("~/Resumes")/" + categoryCompany + "/" + name.replace(/ /g, "") + "/" + resume.version))
+                .attr("href", "@Url.Content("~/Resume")/" + categoryCompany + "/" + name.replace(/ /g, "") + "/" + resume.version))
                 .css("padding-left", "2rem");
 
         var empty = $("<td>");
@@ -251,9 +257,6 @@
 
         var row = $("<tr>");
         row.append(versionCell);
-        if (categoryCompany == "Category") {
-            //row.append($("<td>"));
-        }
         row.append(buttons);
 
         return row;
@@ -423,9 +426,50 @@
         $("#modal").modal("show");
     }
 
-    function editDescriptionModal() {
+    function editCategoryDescriptionModal() {
         var id = $(this).data("id");
-        console.log("Edit Description: ", id);
+        var name = $(this).data("name");
+        var currentDescription = $(this).data("description");
+
+        $("#modal-title")
+            .text("Edit Category Description");
+        $("#modal-body")
+            .append($("<p>")
+                .text("Editting description for category " + name + "."))
+            .append($("<textarea>")
+                .attr("id", "NewDescription")
+                .attr("placeholder", "New Description")
+                .attr("rows", 10)
+                .addClass("form-control")
+                .val(currentDescription));
+        $("#modal-accept")
+            .text("Accept")
+            .on("click", function () {
+                var newDescription = $("#NewDescription").val();
+
+                $("#modal-accept").attr("disabled", "disabled");
+                $("#loading").show();
+
+                $.ajax({
+                    method: "POST",
+                    url: "@Url.Action("EditCategoryDescription", "Resumes")",
+                    data: {
+                        id: id,
+                        description: newDescription
+                    }
+                })
+                .done(function (data, textStatus, jqXHR) {
+                    $("#modal").modal("hide");
+                    getCategoriesAuto();
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    $("#modal .alertText").text(jqXHR.status + ": " + jqXHR.responseText);
+                    $("#modal .alert").show();
+                    $("#loading").hide();
+                    $("#modal-accept").removeAttr("disabled");
+                });
+            });
+        $("#modal").modal("show");
     }
 
     function deleteCategoryModal() {

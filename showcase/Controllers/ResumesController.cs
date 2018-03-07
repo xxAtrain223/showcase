@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -38,6 +39,7 @@ namespace showcase.Controllers
                 {
                     Id = c.Id,
                     Name = c.Name,
+                    Description = c.Description,
                     Resumes = c.Resumes.OrderBy(r => r.Version).ToList()
                 }).
                 OrderBy(c => c.Name).
@@ -45,7 +47,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> Company(string name, int? version)
+        public async Task<ActionResult> CompanyResumeLink(string name, int? version)
         {
             Resume resume = null;
 
@@ -64,7 +66,8 @@ namespace showcase.Controllers
                     ResumeCompanies.
                     Where(c => c.Name.Replace(" ", "").ToLower() == name.Replace(" ", "").ToLower()).
                     SelectMany(c => c.Resumes).
-                    Where(r => r.Version == version).
+                    OrderBy(r => r.Version).
+                    Where(r => r.Version >= version).
                     FirstOrDefaultAsync();
             }
 
@@ -80,8 +83,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
-        [ActionName("Company")]
-        public async Task<ActionResult> Category(string name, int? version)
+        public async Task<ActionResult> CategoryResumeLink(string name, int? version)
         {
             Resume resume = null;
 
@@ -100,7 +102,8 @@ namespace showcase.Controllers
                     ResumeCategories.
                     Where(c => c.Name.Replace(" ", "").ToLower() == name.Replace(" ", "").ToLower()).
                     SelectMany(c => c.Resumes).
-                    Where(r => r.Version == version).
+                    OrderBy(r => r.Version).
+                    Where(r => r.Version >= version).
                     FirstOrDefaultAsync();
             }
 
@@ -244,6 +247,37 @@ namespace showcase.Controllers
             return Ok();
         }
 
+        [HttpPost]
+        public ActionResult EditCategoryDescription(int? id, string description)
+        {
+            if (id == null)
+            {
+                return BadRequest("\"id\" is null");
+            }
+
+            if (String.IsNullOrWhiteSpace(description))
+            {
+                return BadRequest("\"description\" is null or whitespace");
+            }
+
+            ResumeCategory category = db.ResumeCategories.Find(id);
+
+            if (category == null)
+            {
+                return NotFound("Category not found");
+            }
+            
+            category.Description = String.Join("\n", 
+                WebUtility.HtmlEncode(description)
+                    .Replace("\r", "")
+                    .Split("\n", StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => String.Format("<p>{0}</p>", s)));
+
+            db.SaveChanges();
+
+            return Ok();
+        }
+
         [HttpGet]
         [ActionName("Category")]
         public ActionResult GetCategory(int? id)
@@ -326,6 +360,7 @@ namespace showcase.Controllers
                 Categories = categories.Select(c => new {
                     c.Id,
                     c.Name,
+                    c.Description,
                     Resumes = c.Resumes.
                         Select(r => new { r.Id, r.Version }).
                         OrderBy(r => r.Version)

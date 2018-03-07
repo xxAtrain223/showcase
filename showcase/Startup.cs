@@ -96,13 +96,13 @@ namespace showcase
             {
                 routes.MapRoute(
                     name: "Company",
-                    template: "Resumes/Company/{name}/{version}",
-                    defaults: new { controller = "Resumes", action = "Company", name = String.Empty, version = (int?)null });
+                    template: "Resume/Company/{name}/{version}",
+                    defaults: new { controller = "Resumes", action = "CompanyResumeLink", name = String.Empty, version = (int?)null });
 
                 routes.MapRoute(
                     name: "Category",
-                    template: "Resumes/Category/{name}/{version}",
-                    defaults: new { controller = "Resumes", action = "Category", name = String.Empty, version = (int?)null });
+                    template: "Resume/Category/{name}/{version}",
+                    defaults: new { controller = "Resumes", action = "CategoryResumeLink", name = String.Empty, version = (int?)null });
 
                 routes.MapRoute(
                     name: "default",

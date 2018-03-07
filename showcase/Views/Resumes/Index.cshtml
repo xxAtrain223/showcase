@@ -4,16 +4,24 @@
     ViewData["Title"] = "Resumes";
 }
 
+@section head {
+    <style>
+        .card-body p:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+}
+
 <h2>Resumes</h2>
 
 @foreach (var category in Model)
 {
     <div class="card text-dark my-3">
         <div class="card-header">
-            <h1>@category.Name - <a href="~/Resumes/Category/@(category.Name.Replace(" ", ""))" target="_blank">Latest Resume</a></h1>
+            <h1>@category.Name - <a href="~/Resume/Category/@(category.Name.Replace(" ", ""))" target="_blank">Latest Resume</a></h1>
         </div>
         <div class="card-body">
-            TODO: Add field explaining description for each category
+            @Html.Raw(category.Description ?? "")
         </div>
         <div class="card-footer">
             <div class="row">
@@ -24,7 +32,7 @@
                     <ul id="@(category.Name.Replace(" ", ""))Collapse" class="collapse mb-0">
                     @foreach (var resume in category.Resumes)
                     {
-                        <li><a href="~/Resumes/Category/@(category.Name.Replace(" ", ""))/@resume.Version" target="_blank">@category.Name - Version @resume.Version</a></li>
+                        <li><a href="~/Resume/Category/@(category.Name.Replace(" ", ""))/@resume.Version" target="_blank">@category.Name - Version @resume.Version</a></li>
                     }
                     </ul>
                 </div>
