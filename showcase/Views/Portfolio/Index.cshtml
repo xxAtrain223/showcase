@@ -1,0 +1,18 @@
+﻿@model List<showcase.Models.PortfolioEntry>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+@foreach (PortfolioEntry entry in Model)
+{
+    <div class="card">
+        <div class="card-header">
+            <h2>@entry.Title</h2>
+        </div>
+        <div class="card-body">
+            @entry.ShortDescription
+            <a href="~/Portfolio/@entry.Id" class="card-link">Full Entry</a>
+        </div>
+    </div>
+}

@@ -36,7 +36,8 @@ namespace showcase.Data
                     {
                         //Id = i,
                         Name = categories[i].Item1,
-                        Resumes = new List<Resume>()
+                        Resumes = new List<Resume>(),
+                        Description = String.Format("<p>Description for {0}</p>", categories[i].Item1)
                     });
                 }
             }

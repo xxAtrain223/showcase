@@ -13,6 +13,8 @@ namespace showcase.Data
         public DbSet<ResumeCategory> ResumeCategories { get; set; }
         public DbSet<ResumeCompany> ResumeCompanies { get; set; }
         public DbSet<Resume> Resumes { get; set; }
+        public DbSet<PortfolioEntry> PortfolioEntries { get; set; }
+        public DbSet<Image> Images { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -26,7 +28,5 @@ namespace showcase.Data
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
         }
-
-        
     }
 }

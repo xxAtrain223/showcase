@@ -15,6 +15,7 @@ using showcase.Data;
 using showcase.Models;
 using showcase.Models.ResumesViewModels;
 using Newtonsoft.Json;
+using showcase.UtilityFunctions;
 
 namespace showcase.Controllers
 {
@@ -30,7 +31,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> Index()
+        public async Task<IActionResult> Index()
         {
             return View(await db.
                 ResumeCategories.
@@ -47,7 +48,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> CompanyResumeLink(string name, int? version)
+        public async Task<IActionResult> CompanyResumeLink(string name, int? version)
         {
             Resume resume = null;
 
@@ -83,7 +84,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> CategoryResumeLink(string name, int? version)
+        public async Task<IActionResult> CategoryResumeLink(string name, int? version)
         {
             Resume resume = null;
 
@@ -119,7 +120,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> Upload()
+        public async Task<IActionResult> Upload()
         {
             return View(new ResumeUploadViewModel
             {
@@ -130,7 +131,7 @@ namespace showcase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Upload([Bind("Category,Company,FormFile,Categories,Companies")]ResumeUploadViewModel resume)
+        public async Task<IActionResult> Upload([Bind("Category,Company,FormFile,Categories,Companies")]ResumeUploadViewModel resume)
         {
             // Check Category XOR Company
             if (!(String.IsNullOrWhiteSpace(resume.Category) ^
@@ -177,7 +178,7 @@ namespace showcase.Controllers
             string filename = String.Format("{0}.pdf", Guid.NewGuid());
             using (var stream = resume.FormFile.OpenReadStream())
             {
-                SaveStreamToFile(stream, String.Format("{0}/resumes/{1}", env.WebRootPath, filename));
+                ShowcaseUtilities.SaveStreamToFile(stream, string.Format("{0}/resumes/{1}", env.WebRootPath, filename));
             }
 
             Resume newResume = new Resume
@@ -195,23 +196,14 @@ namespace showcase.Controllers
 
             return RedirectToAction("Uploaded");
         }
-
-        private static void SaveStreamToFile(Stream stream, string filepath)
-        {
-            using (var fileSystem = System.IO.File.Create(filepath))
-            {
-                stream.Seek(0, System.IO.SeekOrigin.Begin);
-                stream.CopyTo(fileSystem);
-            }
-        }
-
-        public ActionResult Uploaded()
+        
+        public IActionResult Uploaded()
         {
             Resume newResume = HttpContext.Session.Get<Resume>("NewResume");
             return View(newResume);
         }
 
-        public ActionResult Manage()
+        public IActionResult Manage()
         {
             return View();
         }
@@ -219,7 +211,7 @@ namespace showcase.Controllers
         [HttpPost]
         [HttpPut]
         [ActionName("Category")]
-        public ActionResult PutCategory(int? id, string name)
+        public IActionResult PutCategory(int? id, string name)
         {
             if (String.IsNullOrWhiteSpace(name))
             {
@@ -248,7 +240,7 @@ namespace showcase.Controllers
         }
 
         [HttpPost]
-        public ActionResult EditCategoryDescription(int? id, string description)
+        public IActionResult EditCategoryDescription(int? id, string description)
         {
             if (id == null)
             {
@@ -280,7 +272,7 @@ namespace showcase.Controllers
 
         [HttpGet]
         [ActionName("Category")]
-        public ActionResult GetCategory(int? id)
+        public IActionResult GetCategory(int? id)
         {
             if (id == null)
             {
@@ -309,7 +301,7 @@ namespace showcase.Controllers
 
         [HttpDelete]
         [ActionName("Category")]
-        public ActionResult DeleteCategory(int? id)
+        public IActionResult DeleteCategory(int? id)
         {
             if (id == null)
             {
@@ -333,7 +325,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetCategories(int page = 1, int pagesize = 10)
+        public IActionResult GetCategories(int page = 1, int pagesize = 10)
         {
             if (page < 1)
             {
@@ -371,7 +363,7 @@ namespace showcase.Controllers
         [HttpPost]
         [HttpPut]
         [ActionName("Company")]
-        public ActionResult PutCompany(int? id, string name)
+        public IActionResult PutCompany(int? id, string name)
         {
             if (String.IsNullOrWhiteSpace(name))
             {
@@ -401,7 +393,7 @@ namespace showcase.Controllers
 
         [HttpGet]
         [ActionName("Company")]
-        public ActionResult GetCompany(int? id)
+        public IActionResult GetCompany(int? id)
         {
             if (id == null)
             {
@@ -430,7 +422,7 @@ namespace showcase.Controllers
 
         [HttpDelete]
         [ActionName("Company")]
-        public ActionResult DeleteCompany(int? id)
+        public IActionResult DeleteCompany(int? id)
         {
             if (id == null)
             {
@@ -454,7 +446,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetCompanies(int page = 1, int pagesize = 10)
+        public IActionResult GetCompanies(int page = 1, int pagesize = 10)
         {
             if (page < 1)
             {
@@ -490,7 +482,7 @@ namespace showcase.Controllers
 
         [HttpDelete]
         [ActionName("Resume")]
-        public ActionResult DeleteResume(int? id)
+        public IActionResult DeleteResume(int? id)
         {
             if (id == null)
             {
@@ -510,138 +502,5 @@ namespace showcase.Controllers
 
             return Ok();
         }
-
-        /*
-        // GET: Resumes
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Resume.ToListAsync());
-        }
-
-        // GET: Resumes/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var resume = await _context.Resume
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (resume == null)
-            {
-                return NotFound();
-            }
-
-            return View(resume);
-        }
-
-        // GET: Resumes/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Resumes/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Version,FileName")] Resume resume)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(resume);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(resume);
-        }
-
-        // GET: Resumes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var resume = await _context.Resume.SingleOrDefaultAsync(m => m.Id == id);
-            if (resume == null)
-            {
-                return NotFound();
-            }
-            return View(resume);
-        }
-
-        // POST: Resumes/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Version,FileName")] Resume resume)
-        {
-            if (id != resume.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(resume);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ResumeExists(resume.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(resume);
-        }
-
-        // GET: Resumes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var resume = await _context.Resume
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (resume == null)
-            {
-                return NotFound();
-            }
-
-            return View(resume);
-        }
-
-        // POST: Resumes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var resume = await _context.Resume.SingleOrDefaultAsync(m => m.Id == id);
-            _context.Resume.Remove(resume);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ResumeExists(int id)
-        {
-            return _context.Resume.Any(e => e.Id == id);
-        }
-        */
     }
 }
