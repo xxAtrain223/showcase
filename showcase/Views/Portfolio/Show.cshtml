@@ -1,0 +1,22 @@
+﻿@model showcase.Models.PortfolioEntry
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<h2>@Model.Title</h2>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card text-dark">
+            <div class="card-body">
+                <div class="float-right">
+                    @Model.Image.Display(new { @class = "img-thumbnail" })
+                </div>
+                <div class="float-right">
+                    @Html.Raw(Model.Html)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

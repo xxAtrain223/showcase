@@ -4,15 +4,24 @@
     ViewData["Title"] = "Index";
 }
 
+@section head {
+    <style>
+        .media img {
+            max-width: 20rem;
+            max-height: 20rem;
+            width: auto;
+            height: 100%;
+        }
+    </style>
+}
+
 @foreach (PortfolioEntry entry in Model)
 {
-    <div class="card">
-        <div class="card-header">
-            <h2>@entry.Title</h2>
-        </div>
-        <div class="card-body">
+    <div class="media">
+        @entry.Image.Display(new { @class = "mr-3" })
+        <div class="media-body">
+            <h3 class="mt-0">@entry.Title</h3>
             @entry.ShortDescription
-            <a href="~/Portfolio/@entry.Id" class="card-link">Full Entry</a>
         </div>
     </div>
 }

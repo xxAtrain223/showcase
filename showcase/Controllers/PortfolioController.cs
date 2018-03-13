@@ -150,6 +150,12 @@ namespace showcase.Controllers
             return RedirectToAction(nameof(Show), new { id = entry.Id });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Manage()
+        {
+            return View(db.PortfolioEntries.Include(p => p.Image).ToListAsync());
+        }
+
         /*
         // GET: Portfolio
         public async Task<IActionResult> Index()

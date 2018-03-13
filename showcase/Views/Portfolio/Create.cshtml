@@ -1,0 +1,96 @@
+﻿@model showcase.Models.PortfolioViewModels.PortfolioEntryViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+@section head {
+    <style>
+        #imgOut {
+            max-height: 226px;
+            max-width: 100%;
+            height: auto;
+            width: auto;
+        }
+    </style>
+}
+
+<h2>Create</h2>
+
+<hr />
+<form asp-action="Create">
+    @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="form-row mb-3">
+        <div class="col-12">
+            <div class="form-row">
+                <div class="col-1">
+                    <label asp-for="Title" class="col-form-label"></label>
+                </div>
+                <div class="col-11">
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col-6">
+            <div class="form-group">
+                <label asp-for="Markdown" class="control-label"></label>
+                <textarea asp-for="Markdown" class="form-control" rows="20"></textarea>
+                <span asp-validation-for="Markdown" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label asp-for="Html" class="control-label"></label>
+                <input asp-for="Html" class="form-control" type="hidden" />
+                <div class="card" style="height: 436px; overflow-y: scroll;">
+                    <div class="card-body" id="htmlOutput"></div>
+                </div>
+                <span asp-validation-for="Html" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="form-row mb-2 align-items-end">
+        <div class="col-6">
+            <label asp-for="ShortDescription" class="control-label mb-0"></label>
+        </div>
+        <div class="col-6">Image</div>
+    </div>
+    <div class="form-row mb-3">
+        <div class="col-6">
+            <textarea asp-for="ShortDescription" class="form-control" rows="10"></textarea>
+            <span asp-validation-for="ShortDescription" class="text-danger"></span>
+        </div>
+        <div class="col-2">
+            <button class="btn btn-primary btn-block">Select Image</button>
+        </div>
+        <div class="col-4">
+            <input asp-for="ImageId" type="hidden" class="form-control" />
+            <img id="imgOut" class="img-thumbnail" />
+            <span asp-validation-for="ImageId" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-success" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section scripts {
+    <script>
+        $(function () {
+            $("#imgOut").css("max-height", $("#ShortDescription").css("height"));
+            $("#htmlOutput").parent().css("height", $("#Markdown").css("height"));
+        });
+    </script>
+}
