@@ -1,11 +1,4 @@
-﻿using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Routing;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 
 namespace showcase.Models
@@ -20,16 +13,5 @@ namespace showcase.Models
         public string Path { get; set; }
 
         public string AltText { get; set; }
-
-        public HtmlString Display(Object htmlAttributes)
-        {
-            TagBuilder img = new TagBuilder("img");
-            
-            img.MergeAttribute("src", Path);
-            img.MergeAttribute("alt", AltText ?? "");
-            img.MergeAttributes(new RouteValueDictionary(htmlAttributes));
-
-            return new HtmlString(img.ToString());
-        }
     }
 }

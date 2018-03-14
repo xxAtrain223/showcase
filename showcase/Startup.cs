@@ -11,6 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using showcase.Data;
 using showcase.Models;
 using showcase.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
+using AspNetCore.IServiceCollection.AddIUrlHelper;
 
 namespace showcase
 {
@@ -65,7 +69,9 @@ namespace showcase
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
-
+            
+            services.AddUrlHelper();
+            
             services.AddMvc()
                 .AddSessionStateTempDataProvider();
 
@@ -91,7 +97,7 @@ namespace showcase
             app.UseAuthentication();
 
             app.UseSession();
-
+            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

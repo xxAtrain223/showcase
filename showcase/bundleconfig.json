@@ -52,5 +52,30 @@
             "enabled": true,
             "renameLocals": true
         }
+    },
+    {
+        "outputFileName": "wwwroot/js/showdown.js",
+        "inputFiles": [
+            "wwwroot/lib/showdown/dist/showdown.js",
+            "wwwroot/lib/xss/dist/xss.js",
+            "wwwroot/lib/showdown-xss-filter/showdown-xss-filter.js",
+            "wwwroot/lib/showdown-youtube/dist/showdown-youtube.js"
+        ],
+        "minify": {
+            "enabled": true,
+            "renameLocals": true
+        },
+        "sourceMap": true
+    },
+    {
+        "outputFileName": "wwwroot/js/debounce.js",
+        "inputFiles": [
+            "wwwroot/lib/javascript-debounce/dist/javascript-debounce.js"
+        ],
+        "minify": {
+            "enabled": true,
+            "renameLocals": true
+        },
+        "sourceMap": true
     }
 ]

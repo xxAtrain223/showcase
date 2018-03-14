@@ -1,0 +1,78 @@
+﻿<div class="modal" tabindex="-1" role="dialog" id="imageSelectorModal">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <nav class="nav nav-tabs" id="imageSelectorNav" role="tablist">
+                    <a class="nav-item nav-link active" id="select-tab" data-toggle="tab" href="#select" role="tab" aria-controls="select" aria-selected="true">Select</a>
+                    <a class="nav-item nav-link" id="upload-tab" data-toggle="tab" href="#upload" role="tab" aria-controls="upload" aria-selected="false">Upload</a>
+                </nav>
+                <div class="tab-content" id="imageSelectorContent">
+                    <div class="tab-pane fade show active" id="select" role="tabpanel" aria-labelledby="select-tab">
+                        @Html.Partial("~/Views/Image/_SelectImagePartial.cshtml")
+                    </div>
+                    <div class="tab-pane fade" id="upload" role="tabpanel" aria-labelledby="upload-tab">
+                        @Html.Partial("~/Views/Image/_UploadImagePartial.cshtml")
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="imageSelectorSave">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="imageSelectorClose">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function initSelectUploadModal(inputSelector, imgSelector) {
+        var imageSelectorFuncs = initImageSelector();
+        var imageSelectorGetSelectedImage = imageSelectorFuncs["getSelectedImage"];
+        var imageSelectorSetSelectedImage = imageSelectorFuncs["setSelectedImage"];
+        var imageSelectorReset = imageSelectorFuncs["resetImageSelector"];
+        
+        var imageUploaderFuncs = initImageUploader();
+        var imageUploaderUploadImage = imageUploaderFuncs["uploadImage"];
+        var imageUploaderGetUploadedImage = imageUploaderFuncs["getUploadedImage"];
+
+        function setImage(image) {
+            $(inputSelector).val(image["id"]);
+            $(imgSelector).attr("src", image["src"]);
+        }
+
+        function getImage() {
+            return {
+                "id": $(inputSelector).val(),
+                "src": $(imgSelector).attr("src")
+            };
+        }
+
+        $("#imageSelectorModal").on("show.bs.modal", function () {
+            if ($("#select-tab").hasClass("active")) {
+                imageSelectorSetSelectedImage(getImage());
+            }
+            else if ($("#upload-tab").hasClass("active")) {
+
+            }
+        });
+
+        $("#imageSelectorSave").click(function () {
+            if ($("#select-tab").hasClass("active")) {
+                setImage(imageSelectorGetSelectedImage());
+                imageSelectorReset();
+            }
+            else if ($("#upload-tab").hasClass("active")) {
+                imageUploaderUploadImage();
+                setImage(imageUploaderGetUploadedImage());
+            }
+        });
+
+        $("#imageSelectorClose").click(function () {
+            if ($("#select-tab").hasClass("active")) {
+                imageSelectorReset();
+            }
+            else if ($("#upload-tab").hasClass("active")) {
+
+            }
+        });
+    }
+</script>

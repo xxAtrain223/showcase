@@ -1,7 +1,7 @@
 ﻿@model showcase.Models.PortfolioViewModels.PortfolioEntryViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Edit";
 }
 
 @section head {
@@ -15,16 +15,17 @@
     </style>
 }
 
-<h2>Create</h2>
+<h2>Edit</h2>
 
 <hr />
-<form asp-action="Create">
+<form asp-action="Edit">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
+    <input asp-for="Id" type="hidden" />
     <div class="form-row mb-3">
         <div class="col-12">
             <div class="form-row">
@@ -51,7 +52,9 @@
                 <label asp-for="Html" class="control-label"></label>
                 <input asp-for="Html" class="form-control" type="hidden" />
                 <div class="card text-dark" style="height: 376px; overflow-y: scroll;">
-                    <div class="card-body" id="htmlOutput"></div>
+                    <div class="card-body" id="htmlOutput">
+                        @Html.Raw(Model.Html)
+                    </div>
                 </div>
                 <span asp-validation-for="Html" class="text-danger"></span>
             </div>
@@ -73,12 +76,12 @@
         </div>
         <div class="col-4">
             <input asp-for="ImageId" type="hidden" class="form-control" />
-            <img id="imgOut" class="img-thumbnail" />
+            <img id="imgOut" class="img-thumbnail" src="@Url.Action("GetImage", "Image", new { id = Model.ImageId})" />
             <span asp-validation-for="ImageId" class="text-danger"></span>
         </div>
     </div>
     <div class="form-group">
-        <input type="submit" value="Create" class="btn btn-success" />
+        <input type="submit" value="Save" class="btn btn-success" />
     </div>
 </form>
 
@@ -91,6 +94,7 @@
 
     <script src="~/js/showdown.js"></script>
     <script src="~/js/debounce.js"></script>
+    <script src="~/js/site.js"></script>
 
     <script>
         var mdConverter = new showdown.Converter({

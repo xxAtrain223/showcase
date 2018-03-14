@@ -61,6 +61,7 @@ namespace showcase.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Title,ShortDescription,Markdown,Html,ImageId")] PortfolioEntryViewModel entry)
         {
             if (!ModelState.IsValid)
@@ -78,7 +79,11 @@ namespace showcase.Controllers
             PortfolioEntry newEntry = new PortfolioEntry
             {
                 Title = entry.Title,
-                ShortDescription = entry.ShortDescription,
+                ShortDescription = String.Join("\n",
+                    WebUtility.HtmlEncode(entry.ShortDescription)
+                        .Replace("\r", "")
+                        .Split("\n", StringSplitOptions.RemoveEmptyEntries)
+                        .Select(s => String.Format("<p>{0}</p>", s))),
                 Markdown = entry.Markdown,
                 Html = ShowcaseUtilities.SanitizeHtml(entry.Html),
                 Image = image
@@ -108,11 +113,19 @@ namespace showcase.Controllers
             {
                 return NotFound("Portfolio Entry not found");
             }
-
-            return View(entry);
+            
+            return View(new PortfolioEntryViewModel {
+                Id = entry.Id,
+                Title = entry.Title,
+                ShortDescription = entry.ShortDescription.Replace("<p>", "").Replace("</p>", ""),
+                Markdown = entry.Markdown,
+                Html = entry.Html,
+                ImageId = entry.Image.Id
+            });
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit([Bind("Id,Title,ShortDescription,Markdown,Html,ImageId")] PortfolioEntryViewModel entry)
         {
             if (entry.Id == null)
@@ -153,7 +166,7 @@ namespace showcase.Controllers
         [HttpGet]
         public async Task<IActionResult> Manage()
         {
-            return View(db.PortfolioEntries.Include(p => p.Image).ToListAsync());
+            return View(await db.PortfolioEntries.Include(p => p.Image).ToListAsync());
         }
 
         /*

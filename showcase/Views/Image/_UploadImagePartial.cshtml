@@ -1,0 +1,88 @@
+﻿<div class="row mx-0 mt-1">
+    <input type="hidden" id="uploadedImage" />
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="imageNameInput">Name</label>
+            <input type="text" class="form-control" id="imageNameInput" />
+        </div>
+        <div class="form-group">
+            <label for="imageAltTextInput">Description</label>
+            <textarea class="form-control" id="imageAltTextInput"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="imageFileInput">Image File</label>
+            <label class="custom-file">
+                <input type="file" id="imageFileInput" class="custom-file-input" onchange="loadImage(event)" accept="image/*" />
+                <span class="custom-file-label">Choose file</span>
+            </label>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Image Preview</label>
+            <img class="img-thumbnail" id="imagePreview" style="width: 100%; height: auto;" />
+        </div>
+    </div>
+</div>
+
+<script>
+    function loadImage(event) {
+        $("#imagePreview").attr("src", URL.createObjectURL(event.target.files[0]));
+    }
+
+    function initImageUploader() {
+        function updateCategories(data) {
+            var selectedCategory = $("#imageCategoryInput").val();
+
+            $("#imageCategoryInput").empty();
+
+            for (var i = 0; i < data.length; i++)
+            {
+                $("#imageCategoryInput").append($("<option>", {
+                    "value": data[i]["Id"],
+                    "text": data[i]["Name"],
+                    "selected": (selectedCategory == data[i]["Id"])
+                }));
+            }
+        }
+        
+        function uploadImage() {
+            var formData = new FormData();
+
+            formData.append("Name", $("#imageNameInput").val());
+            formData.append("AltText", $("#imageAltTextInput").val());
+            formData.append("CategoryId", $("#imageCategoryInput").val());
+            formData.append("Image", $("#imageFileInput")[0].files[0]);
+
+            var request = new XMLHttpRequest();
+            request.open("POST", "@Url.Action("UploadImage", "Image")", false);
+            request.onload = function () {
+                var data = JSON.parse(request.response);
+                $("#uploadedImage").data("id", data["id"]).data("src", data["src"]);
+            };
+            request.send(formData);
+        }
+
+        function getUploadedImage() {
+            var uploadedImage = $("#uploadedImage");
+            return {
+                "id": uploadedImage.data("id"),
+                "src": uploadedImage.data("src")
+            };
+        }
+        
+        return {
+            "uploadImage": uploadImage,
+            "getUploadedImage": getUploadedImage
+        };
+    }
+</script>
+
+@*
+public string Name { get; set; }
+public string Path { get; set; }
+public string AltText { get; set; }
+public virtual ApplicationUser UploadedBy { get; set; }
+public virtual ImageCategoryModel Category { get; set; }
+public int CategoryId { get; set; }
+*@

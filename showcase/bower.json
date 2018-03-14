@@ -8,7 +8,12 @@
     "jquery-validation-unobtrusive": "3.2.6",
     "jquery-validation-unobtrusive-bootstrap": "2.0.0",
     "typeahead.js": "0.11.1",
-    "typeahead.js-bootstrap4": "*"
+    "typeahead.js-bootstrap4": "*",
+    "showdown": "1.8.6",
+    "xss": "0.3.5",
+    "showdown-xss-filter": "0.2.0",
+    "showdown-youtube": "1.2.1",
+    "javascript-debounce": "1.0.0"
   },
   "resolutions": {
     "jquery": ">= 1.7.2"

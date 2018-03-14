@@ -4,19 +4,13 @@
     ViewData["Title"] = Model.Title;
 }
 
-<h2>@Model.Title</h2>
+<h1>@Model.Title</h1>
 
-<div class="row">
-    <div class="col-12">
-        <div class="card text-dark">
-            <div class="card-body">
-                <div class="float-right">
-                    @Model.Image.Display(new { @class = "img-thumbnail" })
-                </div>
-                <div class="float-right">
-                    @Html.Raw(Model.Html)
-                </div>
-            </div>
+<div class="card text-dark">
+    <div class="card-body">
+        <div class="float-left">
+            @Html.Raw(Model.Html)
         </div>
+        <img asp-for="Model.Image" class="img-thumbnail float-right w-25" />
     </div>
 </div>
