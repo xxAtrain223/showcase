@@ -186,7 +186,7 @@ namespace showcase.Controllers
                 Category = category,
                 Company = company,
                 FileName = filename,
-                Version = (category?.Resumes?.Count ?? company?.Resumes?.Count) ?? 0
+                Version = (category?.Resumes?.Count ?? company?.Resumes?.Count) ?? 0 // Latest Resume + 1
             };
 
             db.Resumes.Add(newResume);

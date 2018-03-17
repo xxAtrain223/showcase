@@ -4,13 +4,16 @@
     ViewData["Title"] = Model.Title;
 }
 
+@section head {
+    <link href="~/css/BootstrapAdditions.css" rel="stylesheet" />
+}
+
 <h1>@Model.Title</h1>
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning mb-3">Edit</a>
 
 <div class="card text-dark">
-    <div class="card-body">
-        <div class="float-left">
-            @Html.Raw(Model.Html)
-        </div>
-        <img asp-for="Model.Image" class="img-thumbnail float-right w-25" />
+    <div class="card-body clearfix">
+        <img asp-for="Model.Image" class="img-thumbnail float-sm-none w-sm-100 float-md-right w-md-50 m-1" />
+        @Html.Raw(Model.Html)
     </div>
 </div>

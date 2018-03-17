@@ -111,6 +111,16 @@ namespace showcase
                     defaults: new { controller = "Resumes", action = "CategoryResumeLink", name = String.Empty, version = (int?)null });
 
                 routes.MapRoute(
+                    name: "PortfolioTitle",
+                    template: "Portfolio/Show/{title:alpha}",
+                    defaults: new { controller = "Portfolio", action = "Show", id = (int?)null, title = String.Empty });
+
+                routes.MapRoute(
+                    name: "PortfolioId",
+                    template: "Portfolio/Show/{id:int?}",
+                    defaults: new { controller = "Portfolio", action = "Show", id = (int?)null, title = String.Empty });
+
+                routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });

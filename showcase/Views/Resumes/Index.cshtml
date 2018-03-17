@@ -12,13 +12,13 @@
     </style>
 }
 
-<h2>Resumes</h2>
+<h1>Resumes</h1>
 
 @foreach (var category in Model)
 {
     <div class="card text-dark my-3">
         <div class="card-header">
-            <h1>@category.Name - <a href="~/Resume/Category/@(category.Name.Replace(" ", ""))" target="_blank">Latest Resume</a></h1>
+            <h2>@category.Name - <a asp-route="Category" asp-route-name="@category.Name.Replace(" ", "")">Latest Resume</a></h2>
         </div>
         <div class="card-body">
             @Html.Raw(category.Description ?? "")
@@ -32,7 +32,7 @@
                     <ul id="@(category.Name.Replace(" ", ""))Collapse" class="collapse mb-0">
                     @foreach (var resume in category.Resumes)
                     {
-                        <li><a href="~/Resume/Category/@(category.Name.Replace(" ", ""))/@resume.Version" target="_blank">@category.Name - Version @resume.Version</a></li>
+                        <li><a asp-route="Category" asp-route-name="@category.Name.Replace(" ", "")" asp-route-version="@resume.Version">@category.Name - Version @resume.Version</a></li>
                     }
                     </ul>
                 </div>

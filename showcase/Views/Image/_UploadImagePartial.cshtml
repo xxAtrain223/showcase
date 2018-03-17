@@ -27,38 +27,25 @@
 
 <script>
     function loadImage(event) {
-        $("#imagePreview").attr("src", URL.createObjectURL(event.target.files[0]));
+        $("#imagePreview")
+            .attr("src", URL.createObjectURL(event.target.files[0]))
+            .attr("alt", $("#imageAltTextInput").val())
+            .attr("title", $("#imageAltTextInput").val());
     }
 
     function initImageUploader() {
-        function updateCategories(data) {
-            var selectedCategory = $("#imageCategoryInput").val();
-
-            $("#imageCategoryInput").empty();
-
-            for (var i = 0; i < data.length; i++)
-            {
-                $("#imageCategoryInput").append($("<option>", {
-                    "value": data[i]["Id"],
-                    "text": data[i]["Name"],
-                    "selected": (selectedCategory == data[i]["Id"])
-                }));
-            }
-        }
-        
         function uploadImage() {
             var formData = new FormData();
 
             formData.append("Name", $("#imageNameInput").val());
             formData.append("AltText", $("#imageAltTextInput").val());
-            formData.append("CategoryId", $("#imageCategoryInput").val());
             formData.append("Image", $("#imageFileInput")[0].files[0]);
 
             var request = new XMLHttpRequest();
             request.open("POST", "@Url.Action("UploadImage", "Image")", false);
             request.onload = function () {
                 var data = JSON.parse(request.response);
-                $("#uploadedImage").data("id", data["id"]).data("src", data["src"]);
+                $("#uploadedImage").data("id", data["id"]).data("src", data["src"]).data("alt", data["alt"]);
             };
             request.send(formData);
         }
@@ -67,7 +54,8 @@
             var uploadedImage = $("#uploadedImage");
             return {
                 "id": uploadedImage.data("id"),
-                "src": uploadedImage.data("src")
+                "src": uploadedImage.data("src"),
+                "alt": uploadedImage.data("alt")
             };
         }
         
@@ -77,12 +65,3 @@
         };
     }
 </script>
-
-@*
-public string Name { get; set; }
-public string Path { get; set; }
-public string AltText { get; set; }
-public virtual ApplicationUser UploadedBy { get; set; }
-public virtual ImageCategoryModel Category { get; set; }
-public int CategoryId { get; set; }
-*@

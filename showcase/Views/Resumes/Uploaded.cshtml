@@ -9,11 +9,11 @@
     The resume was successfully uploaded to
     @if (Model.Category != null)
     {
-        <a href="~/Resume/Category/@(Model.Category.Name.Replace(" ", ""))/@Model.Version" target="_blank" class="alert-link">@Model.Category.Name - Version @Model.Version</a>
+        <a asp-route="Category" asp-route-name="@Model.Category.Name.Replace(" ", "")" asp-route-version="@Model.Version" class="alert-link">@Model.Category.Name - Version @Model.Version</a>
     }
     else if (Model.Company != null)
     {
-        <a href="~/Resume/Company/@(Model.Company.Name.Replace(" ", ""))/@Model.Version" target="_blank" class="alert-link">@Model.Company.Name - Version @Model.Version</a>
+        <a asp-route="Company" asp-route-name="@Model.Company.Name.Replace(" ", "")" asp-route-version="@Model.Version" class="alert-link">@Model.Company.Name - Version @Model.Version</a>
     }
     else
     {

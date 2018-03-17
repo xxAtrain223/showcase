@@ -63,7 +63,8 @@
 
                 var button = $("<button>", {
                     "class": "m-1 btn " + (($("#selectedImage").val() == image["id"]) ? "btn-primary" : "btn-secondary"),
-                    "data-id": image["id"]
+                    "data-id": image["id"],
+                    "title": image["alt"]
                 });
 
                 button.append($("<img>", {
@@ -102,17 +103,17 @@
         $("#imageSelectorBody").on("click", "button", function () {
             if ($(this).hasClass("btn-primary")) {
                 $(this).removeClass("btn-primary").addClass("btn-secondary");
-                setSelectedImage({ "id": "", "src": "" });
+                setSelectedImage({ "id": "", "src": "", "alt": "" });
             }
             else if ($(this).hasClass("btn-secondary")) {
                 $("#imageSelectorBody button").removeClass("btn-primary").addClass("btn-secondary");
                 $(this).removeClass("btn-secondary").addClass("btn-primary");
-                setSelectedImage({ "id": $(this).data("id"), "src": $(this).find("img").attr("src") });
+                setSelectedImage({ "id": $(this).data("id"), "src": $(this).find("img").attr("src"), "alt": $(this).find("img").attr("alt") });
             }
         });
 
         function setSelectedImage(image) {
-            $("#selectedImage").data("id", image["id"]).data("src", image["src"]);
+            $("#selectedImage").data("id", image["id"]).data("src", image["src"]).data("alt", image["alt"]);
             if (image["id"] != "") {
                 $("#imageSelectorBody [data-id={0}]".format(image["id"])).removeClass("btn-secondary").addClass("btn-primary");
             }
@@ -122,13 +123,18 @@
             var selectedImage = $("#selectedImage");
             return {
                 "id": selectedImage.data("id"),
-                "src": selectedImage.data("src")
+                "src": selectedImage.data("src"),
+                "alt": selectedImage.data("alt")
             };
         }
         
         function resetImageSelector() {
-            setSelectedImage({ "id": "", "src": "" });
+            setSelectedImage({ "id": "", "src": "", "alt": "" });
             $("#imageSelectorBody .btn-primary").removeClass("btn-primary").addClass("btn-secondary");
+        }
+
+        function getImagesFromServer() {
+            getImages($("#imageSelectorPaginator .active a").data("page"), 6);
         }
         
         getImages($("#imageSelectorPaginator .active a").data("page"), 6);
@@ -136,7 +142,8 @@
         return {
             "getSelectedImage": getSelectedImage,
             "setSelectedImage": setSelectedImage,
-            "resetImageSelector": resetImageSelector
+            "resetImageSelector": resetImageSelector,
+            "getImagesFromServer": getImagesFromServer
         };
     }
 </script>

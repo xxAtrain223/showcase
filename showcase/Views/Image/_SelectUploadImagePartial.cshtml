@@ -29,6 +29,7 @@
         var imageSelectorGetSelectedImage = imageSelectorFuncs["getSelectedImage"];
         var imageSelectorSetSelectedImage = imageSelectorFuncs["setSelectedImage"];
         var imageSelectorReset = imageSelectorFuncs["resetImageSelector"];
+        var imageSelectorGetImagesFromServer = imageSelectorFuncs["getImagesFromServer"];
         
         var imageUploaderFuncs = initImageUploader();
         var imageUploaderUploadImage = imageUploaderFuncs["uploadImage"];
@@ -37,12 +38,15 @@
         function setImage(image) {
             $(inputSelector).val(image["id"]);
             $(imgSelector).attr("src", image["src"]);
+            $(imgSelector).attr("alt", image["alt"]);
+            $(imgSelector).attr("title", image["alt"]);
         }
 
         function getImage() {
             return {
                 "id": $(inputSelector).val(),
-                "src": $(imgSelector).attr("src")
+                "src": $(imgSelector).attr("src"),
+                "alt": $(imgSelector).attr("alt")
             };
         }
 
@@ -63,6 +67,7 @@
             else if ($("#upload-tab").hasClass("active")) {
                 imageUploaderUploadImage();
                 setImage(imageUploaderGetUploadedImage());
+                imageSelectorGetImagesFromServer();
             }
         });
 

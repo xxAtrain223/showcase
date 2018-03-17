@@ -1,0 +1,15 @@
+﻿@import "../../lib/bootstrap/scss/_functions.scss";
+@import "../../lib/bootstrap/scss/_variables.scss";
+@import "../../lib/bootstrap/scss/mixins/_breakpoints.scss";
+
+@each $breakpoint, $breakpoint-size in $grid-breakpoints {
+    @include media-breakpoint-up($breakpoint) {
+        @each $prop, $abbrev in (width: w, height: h) {
+            @each $size, $length in $sizes {
+                .#{$abbrev}-#{$breakpoint}-#{$size} {
+                    #{$prop}: $length !important;
+                }
+            }
+        }
+    }
+}

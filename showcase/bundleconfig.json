@@ -77,5 +77,15 @@
             "renameLocals": true
         },
         "sourceMap": true
+    },
+    {
+        "outputFileName": "wwwroot/css/BootstrapAdditions.css",
+        "inputFiles": [
+            "wwwroot/src/css/BootstrapAdditions.css"
+        ],
+        "minify": {
+            "enabled": true,
+            "renameLocals": true
+        }
     }
 ]

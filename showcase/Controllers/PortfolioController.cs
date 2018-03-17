@@ -34,18 +34,29 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Show(int? id)
+        public async Task<IActionResult> Show(int? id, string title)
         {
-            if (id == null)
+            PortfolioEntry entry = null;
+
+            if (id != null)
             {
-                return BadRequest("\"id\" is null");
+                entry = await db.PortfolioEntries
+                    .Include(p => p.Image)
+                    .Where(p => p.Id == id)
+                    .FirstOrDefaultAsync();
             }
-
-            PortfolioEntry entry = await db.PortfolioEntries
-                .Include(p => p.Image)
-                .Where(p => p.Id == id)
-                .FirstOrDefaultAsync();
-
+            else if (!String.IsNullOrWhiteSpace(title))
+            {
+                entry = await db.PortfolioEntries
+                    .Include(p => p.Image)
+                    .Where(p => p.Title.Replace(" ", "").ToLower() == title.Replace(" ", "").ToLower())
+                    .FirstOrDefaultAsync();
+            }
+            else
+            {
+                return BadRequest("id and title are null");
+            }
+            
             if (entry == null)
             {
                 return NotFound("Portfolio Entry not found");
@@ -120,7 +131,7 @@ namespace showcase.Controllers
                 ShortDescription = entry.ShortDescription.Replace("<p>", "").Replace("</p>", ""),
                 Markdown = entry.Markdown,
                 Html = entry.Html,
-                ImageId = entry.Image.Id
+                ImageId = entry.Image?.Id
             });
         }
 
@@ -133,7 +144,10 @@ namespace showcase.Controllers
                 return BadRequest("\"id\" is null");
             }
 
-            PortfolioEntry oldEntry = await db.PortfolioEntries.FindAsync(entry.Id);
+            PortfolioEntry oldEntry = await db.PortfolioEntries
+                .Where(p => p.Id == entry.Id)
+                .Include(p => p.Image)
+                .FirstOrDefaultAsync();
 
             if (oldEntry == null)
             {
@@ -153,7 +167,11 @@ namespace showcase.Controllers
             }
             
             oldEntry.Title = entry.Title;
-            oldEntry.ShortDescription = entry.ShortDescription;
+            oldEntry.ShortDescription = String.Join("\n",
+                WebUtility.HtmlEncode(entry.ShortDescription)
+                    .Replace("\r", "")
+                    .Split("\n", StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => String.Format("<p>{0}</p>", s)));
             oldEntry.Image = image;
             oldEntry.Markdown = entry.Markdown;
             oldEntry.Html = ShowcaseUtilities.SanitizeHtml(entry.Html);
@@ -163,143 +181,27 @@ namespace showcase.Controllers
             return RedirectToAction(nameof(Show), new { id = entry.Id });
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Manage()
-        {
-            return View(await db.PortfolioEntries.Include(p => p.Image).ToListAsync());
-        }
-
-        /*
-        // GET: Portfolio
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Portfolio.ToListAsync());
-        }
-
-        // GET: Portfolio/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var portfolio = await _context.Portfolio
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (portfolio == null)
-            {
-                return NotFound();
-            }
-
-            return View(portfolio);
-        }
-
-        // GET: Portfolio/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Portfolio/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,ShortDescription,Markdown,Html")] Portfolio portfolio)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(portfolio);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(portfolio);
-        }
-
-        // GET: Portfolio/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return BadRequest("\"id\" is null");
             }
 
-            var portfolio = await _context.Portfolio.SingleOrDefaultAsync(m => m.Id == id);
-            if (portfolio == null)
+            PortfolioEntry entry = await db.PortfolioEntries.FindAsync(id);
+
+            if (entry == null)
             {
-                return NotFound();
-            }
-            return View(portfolio);
-        }
-
-        // POST: Portfolio/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,ShortDescription,Markdown,Html")] Portfolio portfolio)
-        {
-            if (id != portfolio.Id)
-            {
-                return NotFound();
+                return NotFound("Portfolio Entry not found");
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(portfolio);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PortfolioExists(portfolio.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(portfolio);
-        }
+            db.PortfolioEntries.Remove(entry);
 
-        // GET: Portfolio/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            await db.SaveChangesAsync();
 
-            var portfolio = await _context.Portfolio
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (portfolio == null)
-            {
-                return NotFound();
-            }
-
-            return View(portfolio);
-        }
-
-        // POST: Portfolio/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var portfolio = await _context.Portfolio.SingleOrDefaultAsync(m => m.Id == id);
-            _context.Portfolio.Remove(portfolio);
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
-        private bool PortfolioExists(int id)
-        {
-            return _context.Portfolio.Any(e => e.Id == id);
-        }
-        */
     }
 }

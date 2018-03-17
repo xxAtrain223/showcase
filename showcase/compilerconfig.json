@@ -2,5 +2,9 @@
   {
     "outputFile": "wwwroot/css/profilePicture.css",
     "inputFile": "wwwroot/css/profilePicture.scss"
+  },
+  {
+    "outputFile": "wwwroot/src/css/BootstrapAddons.css",
+    "inputFile": "wwwroot/src/css/BootstrapAddons.scss"
   }
 ]

@@ -6,7 +6,7 @@
 
 @section head {
     <style>
-        .media img {
+        .card-body img {
             max-width: 10rem;
             max-height: 10rem;
         }
@@ -16,15 +16,12 @@
 @foreach (PortfolioEntry entry in Model)
 {
     <div class="card text-dark my-3">
-        <div class="card-body">
-            <div class="media">
-                <img asp-for="entry.Image" class="mr-3" />
-                <div class="media-body">
-                    <h2 class="mt-0">@entry.Title</h2>
-                    @Html.Raw(entry.ShortDescription)
-                    <p>@Html.ActionLink("Full Project", "Show", routeValues: new { id = entry.Id })</p>
-                </div>
-            </div>
+        <div class="card-header">
+            <h2 class="mt-0">@entry.Title - <a asp-action="Show" asp-route-id="@entry.Id">Full Project</a></h2>
+        </div>
+        <div class="card-body clearfix">
+            <img asp-for="entry.Image" class="img-thumbnail float-left mr-1 mb-0" />
+            @Html.Raw(entry.ShortDescription)
         </div>
     </div>
 }
