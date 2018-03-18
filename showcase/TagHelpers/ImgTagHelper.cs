@@ -17,6 +17,9 @@ namespace showcase.TagHelpers
         [HtmlAttributeName("asp-for")]
         public Image For { get; set; }
 
+        [HtmlAttributeName("asp-null-behavior")]
+        public NullBehavior NullBehavior { get; set; }
+
         public IUrlHelper Url { get; }
 
         public ImgTagHelper(IUrlHelper urlHelper)
@@ -36,8 +39,23 @@ namespace showcase.TagHelpers
             }
             else
             {
-                output.SuppressOutput();
+                switch (NullBehavior)
+                {
+                    case NullBehavior.EmptySrc:
+                        output.Attributes.Add("src", "");
+                        break;
+                    case NullBehavior.Hide:
+                    default:
+                        output.SuppressOutput();
+                        break;
+                }
             }
         }
+    }
+
+    public enum NullBehavior
+    {
+        Hide,
+        EmptySrc
     }
 }

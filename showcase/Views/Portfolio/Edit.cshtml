@@ -75,7 +75,7 @@
         </div>
         <div class="col-4">
             <input asp-for="ImageId" type="hidden" class="form-control" />
-            <img id="imgOut" class="img-thumbnail" src="@(Model.ImageId != null ? Url.Action("GetImage", "Image", new { id = Model.ImageId}) : "")" />
+            <img asp-for="Model.Image" asp-null-behavior="EmptySrc" id="imgOut" class="img-thumbnail" />
             <span asp-validation-for="ImageId" class="text-danger"></span>
         </div>
     </div>

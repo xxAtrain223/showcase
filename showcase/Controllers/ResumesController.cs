@@ -181,12 +181,15 @@ namespace showcase.Controllers
                 ShowcaseUtilities.SaveStreamToFile(stream, string.Format("{0}/resumes/{1}", env.WebRootPath, filename));
             }
 
+            List<Resume> resumes = (category?.Resumes ?? company?.Resumes)?
+                .OrderBy(r => r.Version).ToList();
+
             Resume newResume = new Resume
             {
                 Category = category,
                 Company = company,
                 FileName = filename,
-                Version = (category?.Resumes?.Count ?? company?.Resumes?.Count) ?? 0 // Latest Resume + 1
+                Version = resumes?.LastOrDefault()?.Version + 1 ?? 0
             };
 
             db.Resumes.Add(newResume);

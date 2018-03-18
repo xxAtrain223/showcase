@@ -20,5 +20,6 @@ namespace showcase.Models.PortfolioViewModels
         public string Html { get; set; }
         [Display(Name = "Image")]
         public int? ImageId { get; set; }
+        public Image Image { get; set; }
     }
 }

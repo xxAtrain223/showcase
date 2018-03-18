@@ -64,13 +64,14 @@
                 var button = $("<button>", {
                     "class": "m-1 btn " + (($("#selectedImage").val() == image["id"]) ? "btn-primary" : "btn-secondary"),
                     "data-id": image["id"],
-                    "title": image["alt"]
+                    "title": image["alt"],
+                    "style": "height: 45%; width: 31%;"
                 });
 
                 button.append($("<img>", {
                     "src": image["src"],
                     "alt": image["alt"],
-                    "style": "width: 200px; height: auto;"
+                    "style": "max-height: 75%; max-width: 100%;"
                 }));
 
                 button.append($("<label>", {

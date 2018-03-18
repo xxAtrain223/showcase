@@ -131,7 +131,8 @@ namespace showcase.Controllers
                 ShortDescription = entry.ShortDescription.Replace("<p>", "").Replace("</p>", ""),
                 Markdown = entry.Markdown,
                 Html = entry.Html,
-                ImageId = entry.Image?.Id
+                ImageId = entry.Image?.Id,
+                Image = entry.Image
             });
         }
 
