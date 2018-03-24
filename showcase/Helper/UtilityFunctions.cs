@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace showcase.UtilityFunctions
 {
@@ -73,6 +74,15 @@ namespace showcase.UtilityFunctions
             {
                 stream.Seek(0, SeekOrigin.Begin);
                 stream.CopyTo(fileSystem);
+            }
+        }
+
+        public static async Task SaveStreamToFileAsync(Stream stream, string filepath)
+        {
+            using (var fileSystem = File.Create(filepath))
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+                await stream.CopyToAsync(fileSystem);
             }
         }
 

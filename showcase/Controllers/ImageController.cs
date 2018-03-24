@@ -25,25 +25,10 @@ namespace showcase.Controllers
             db = context;
             env = environment;
         }
-
-        public ActionResult List(int pagesize = 10, int page = 1)
-        {
-            page = (page > 0) ? page - 1 : 0;
-
-            int count = db.Images.Count();
-
-            ViewBag.numberOfPages = count / pagesize + 1;
-
-            return View(db.Images
-                .OrderByDescending((i) => i.Id)
-                .Skip(page * pagesize)
-                .Take(pagesize)
-                .ToList());
-        }
-
+        
         [HttpGet]
-        [Route("Image/{id}")]
-        public async Task<ActionResult> GetImage(int id = -1)
+        [Route("Image/{id:int}")]
+        public async Task<IActionResult> GetImage(int id = -1)
         {
             Image image = await db.Images.FindAsync(id);
 
@@ -106,6 +91,133 @@ namespace showcase.Controllers
             {
                 Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 return Json(new { error = "File is not an image" });
+            }
+        }
+
+        public async Task<IActionResult> Manage(int pagesize = 10, int page = 1)
+        {
+            double count = await db.Images.CountAsync();
+
+            ViewBag.currentPage = page;
+            ViewBag.numberOfPages = (int)Math.Ceiling(count / pagesize);
+
+            return View(await db.Images
+                .Skip((page - 1) * pagesize)
+                .Take(pagesize)
+                .ToListAsync());
+        }
+
+        // GET: Image/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest("\"id\" is null");
+            }
+
+            var image = await db.Images.FindAsync(id);
+
+            if (image == null)
+            {
+                return NotFound();
+            }
+
+            return View(image);
+        }
+
+        // POST: Image/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit([Bind("Id,Name,AltText")] Image image)
+        {
+            Image currentImage = await db.Images.FindAsync(image.Id);
+
+            if (currentImage == null)
+            {
+                return NotFound("currentImage not found");
+            }
+
+            currentImage.Name = image.Name;
+            currentImage.AltText = image.AltText;
+
+            if (ModelState.IsValid)
+            {
+                db.Update(currentImage);
+                await db.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Manage));
+            }
+
+            return View(image);
+        }
+
+        // GET: Image/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest("\"id\" is null");
+            }
+
+            Image image = await db.Images.FindAsync(id);
+
+            if (image == null)
+            {
+                return NotFound();
+            }
+
+            return View(image);
+        }
+
+        // POST: Image/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            Image image = await db.Images.FindAsync(id);
+
+            string realPath = image.Path.Replace("~", env.WebRootPath);
+            
+            db.Images.Remove(image);
+            await db.SaveChangesAsync();
+
+            System.IO.File.Delete(realPath);
+
+            return RedirectToAction(nameof(Manage));
+        }
+
+        [HttpGet]
+        public IActionResult Upload()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Upload(string Name, string AltText, IFormFile FormFile)
+        {
+            if (ShowcaseUtilities.IsImage(FormFile))
+            {
+                string virtualPath = String.Format("~/images/{0}{1}", Guid.NewGuid(), Path.GetExtension(FormFile.FileName));
+                await ShowcaseUtilities.SaveStreamToFileAsync(FormFile.OpenReadStream(), virtualPath.Replace("~", env.WebRootPath));
+
+                Image imageModel = new Image
+                {
+                    Name = Name,
+                    AltText = AltText,
+                    Path = virtualPath
+                };
+
+                await db.Images.AddAsync(imageModel);
+                await db.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Manage));
+            }
+            else
+            {
+                return BadRequest("File is not an image");
             }
         }
 

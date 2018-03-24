@@ -1,0 +1,42 @@
+﻿@model List<showcase.Models.Image>
+
+@{
+    ViewData["Title"] = "Manage Images";
+    int imagesPerRow = 3;
+
+}
+
+@section head  {
+    <style>
+        .card-img-top {
+            min-height: 1px; /*IE bug workaround*/
+        }
+    </style>
+}
+
+<h1>Manage Images</h1>
+
+<a asp-action="Upload" class="btn btn-success">Upload New Image</a>
+
+@for (int i = 0; i < Model.Count; i += imagesPerRow)
+{
+    <div class="row my-3">
+        @for (int j = 0; j < imagesPerRow && (i + j) < Model.Count; j++)
+        {
+            Image image = Model[i + j];
+            <div class="col-sm-12 col-md-@(12 / imagesPerRow)">
+                <div class="card text-dark">
+                    <img asp-for="@image" class="card-img-top" />
+                    <div class="card-body">
+                        <h5 class="card-title">@image.Name</h5>
+                        <p class="card-text">@image.AltText</p>
+                        <div class="btn-group">
+                            <a asp-action="Edit" asp-route-id="@image.Id" class="btn btn-warning">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@image.Id" class="btn btn-danger">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -52,7 +52,6 @@
 
   <ItemGroup>
     <Folder Include="Data\seed\" />
-    <Folder Include="Views\Image\" />
     <Folder Include="wwwroot\images\" />
     <Folder Include="wwwroot\resumes\" />
   </ItemGroup>
