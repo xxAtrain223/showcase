@@ -10,6 +10,14 @@
     <Compile Remove="Data\Migrations\20180206051018_AddResumeModels.Designer.cs" />
     <Compile Remove="Data\Migrations\20180206051342_AddResumeModels.cs" />
     <Compile Remove="Data\Migrations\20180206051342_AddResumeModels.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180405055836_AddedBlogEntry.cs" />
+    <Compile Remove="Data\Migrations\20180405055836_AddedBlogEntry.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180405055924_AddedBlogEntry.cs" />
+    <Compile Remove="Data\Migrations\20180405055924_AddedBlogEntry.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180406071936_AddedBlogEntryAndTags.cs" />
+    <Compile Remove="Data\Migrations\20180406071936_AddedBlogEntryAndTags.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180406081314_AddedBlogEntryAndTags.cs" />
+    <Compile Remove="Data\Migrations\20180406081314_AddedBlogEntryAndTags.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

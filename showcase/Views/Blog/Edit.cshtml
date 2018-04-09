@@ -1,7 +1,7 @@
-﻿@model showcase.Models.PortfolioViewModels.PortfolioEntryViewModel
+﻿@model showcase.Models.BlogViewModels.BlogEntryViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Edit";
 }
 
 @section head {
@@ -15,15 +15,16 @@
     </style>
 }
 
-<h2>Create</h2>
+<h2>Edit</h2>
 
 <hr />
-<form asp-action="Create">
+<form asp-action="Edit">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
+    <input asp-for="Id" type="hidden" />
     <div class="form-row mb-3">
         <div class="col-1">
             <label asp-for="Title" class="col-form-label"></label>
@@ -31,6 +32,29 @@
         <div class="col-11">
             <input asp-for="Title" class="form-control" />
             <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-row mb-3">
+        <div class="col-1">
+            <label asp-for="Tags" class="col-form-label"></label>
+        </div>
+        <div class="col-3">
+            <input asp-for="Tags" class="form-control" />
+            <span asp-validation-for="Tags" class="text-danger"></span>
+        </div>
+        <div class="col-2">
+            <label asp-for="TitlePlacement" class="col-form-label"></label>
+        </div>
+        <div class="col-2">
+            <select asp-for="TitlePlacement" asp-items="Html.GetEnumSelectList<TitlePlacement>()" class="form-control"></select>
+            <span asp-validation-for="TitlePlacement" class="text-danger"></span>
+        </div>
+        <div class="col-2">
+            <label asp-for="ImagePlacement" class="col-form-label"></label>
+        </div>
+        <div class="col-2">
+            <select asp-for="ImagePlacement" asp-items="Html.GetEnumSelectList<ImagePlacement>()" class="form-control"></select>
+            <span asp-validation-for="ImagePlacement" class="text-danger"></span>
         </div>
     </div>
     <div class="form-row">
@@ -46,7 +70,9 @@
                 <label asp-for="Html" class="control-label"></label>
                 <input asp-for="Html" class="form-control" type="hidden" />
                 <div class="card text-dark" style="height: 376px; overflow-y: scroll;">
-                    <div class="card-body" id="htmlOutput"></div>
+                    <div class="card-body" id="htmlOutput">
+                        @Html.Raw(Model.Html)
+                    </div>
                 </div>
                 <span asp-validation-for="Html" class="text-danger"></span>
             </div>
@@ -68,14 +94,50 @@
         </div>
         <div class="col-4">
             <input asp-for="ImageId" type="hidden" class="form-control" />
-            <img id="imgOut" class="img-thumbnail" />
+            <img asp-for="Model.Image" asp-null-behavior="EmptySrc" id="imgOut" class="img-thumbnail" />
             <span asp-validation-for="ImageId" class="text-danger"></span>
         </div>
     </div>
+    <div class="form-check custom-checkbox">
+        <input asp-for="ShowOnList" class="form-check-input">
+        <label asp-for="ShowOnList" class="form-check-label"></label>
+        <span asp-validation-for="ShowOnList" class="text-danger"></span>
+    </div>
+    <div class="form-check custom-checkbox mb-3">
+        <input asp-for="ShowFooter" class="form-check-input">
+        <label asp-for="ShowFooter" class="form-check-label"></label>
+        <span asp-validation-for="ShowOnList" class="text-danger"></span>
+    </div>
     <div class="form-group">
-        <input type="submit" value="Create" class="btn btn-success" />
+        <input type="submit" value="Save" class="btn btn-success" />
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">Delete</button>
     </div>
 </form>
+
+<div class="modal fade text-dark" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="deleteModalLabel">Delete Entry</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this entry?
+                <div class="alert alert-danger" role="alert">
+                    This cannot be undone.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                    <input type="submit" value="Delete" class="btn btn-danger" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="text-dark">
     @Html.Partial("~/Views/Image/_SelectUploadImagePartial.cshtml")
@@ -86,6 +148,7 @@
 
     <script src="~/js/showdown.js"></script>
     <script src="~/js/debounce.js"></script>
+    <script src="~/js/site.js"></script>
 
     <script>
         var mdConverter = new showdown.Converter({

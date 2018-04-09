@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace showcase.Models
 {
@@ -16,5 +17,7 @@ namespace showcase.Models
         public string Markdown { get; set; }
 
         public string Html { get; set; }
+
+        public List<Tag> Tags { get; set; }
     }
 }

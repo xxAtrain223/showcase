@@ -1,0 +1,123 @@
+﻿@model showcase.Models.BlogEntry
+
+@{
+    string cardWidth = "col-12";
+    string imageOrder = "";
+    string imgFloat = "";
+    switch (Model.ImagePlacement)
+    {
+        case ImagePlacement.LeftOfCard:
+            imageOrder = "order-1";
+            cardWidth = "col-8";
+            break;
+        case ImagePlacement.RightOfCard:
+            imageOrder = "order-3";
+            cardWidth = "col-8";
+            break;
+        case ImagePlacement.CardBodyLeft:
+            imgFloat = "float-md-left";
+            break;
+        case ImagePlacement.CardBodyRight:
+            imgFloat = "float-md-right";
+            break;
+    }
+}
+
+@section head {
+    <link href="~/css/BootstrapAdditions.css" rel="stylesheet" />
+
+    @if (Model.Image != null && Model.ImagePlacement == ImagePlacement.Jumbotron)
+    {
+        <style>
+            .jumbotron {
+                padding: 0;
+            }
+
+                .jumbotron img {
+                    width: 100%;
+                    border-radius: .3rem;
+                    -webkit-user-select: none;
+                    -khtml-user-select: none;
+                    -moz-user-select: none;
+                    -o-user-select: none;
+                    user-select: none;
+                }
+        </style>
+    }
+
+    @if (Model.TitlePlacement == TitlePlacement.Jumbotron && (Model.Image != null && Model.ImagePlacement == ImagePlacement.Jumbotron))
+    {
+        <style>
+            .jumbotron {
+                position: relative;
+            }
+
+                .jumbotron h1 {
+                    position: absolute;
+                    top: 4rem;
+                    bottom: 2rem;
+                    left: 2rem;
+                    right: 4rem;
+                }
+        </style>
+    }
+}
+
+<a asp-action="Edit" asp-controller="Blog" asp-route-id="@Model.Id" class="btn btn-warning mb-3">Edit</a>
+
+@if (Model.TitlePlacement == TitlePlacement.Jumbotron || (Model.Image != null && Model.ImagePlacement == ImagePlacement.Jumbotron))
+{
+    <div class="jumbotron text-dark">
+        @if (Model.Image != null && Model.ImagePlacement == ImagePlacement.Jumbotron)
+        {
+            <img asp-for="Model.Image" />
+        }
+        @if (Model.TitlePlacement == TitlePlacement.Jumbotron)
+        {
+            <h1>@Model.Title</h1>
+        }
+    </div>
+}
+
+@if (Model.TitlePlacement == TitlePlacement.AboveCard)
+{
+    <h1>@Model.Title</h1>
+}
+
+@**@
+<div class="row">
+    @if (Model.Image != null && (Model.ImagePlacement == ImagePlacement.LeftOfCard || Model.ImagePlacement == ImagePlacement.RightOfCard))
+    {
+        <div class="col-4 @imageOrder">
+            <img asp-for="Model.Image" class="img-fluid rounded w-100" />
+        </div>
+    }
+    <div class="@cardWidth order-2">
+        <div class="card text-dark">
+            @if (Model.Image != null && Model.ImagePlacement == ImagePlacement.CardTop)
+            {
+                <img asp-for="Model.Image" class="card-img-top" />
+            }
+            @if (Model.TitlePlacement == TitlePlacement.CardHeader)
+            {
+                <div class="card-header">
+                    <h1>@Model.Title</h1>
+                </div>
+            }
+            <div class="card-body clearfix">
+                @if (Model.Image != null && (Model.ImagePlacement == ImagePlacement.CardBodyLeft || Model.ImagePlacement == ImagePlacement.CardBodyRight))
+                {
+                    <img asp-for="Model.Image" class="img-thumbnail float-sm-none w-sm-100 @imgFloat w-md-50 m-1" />
+                }
+                @Html.Raw(Model.Html)
+            </div>
+            @if (Model.ShowFooter)
+            {
+                <div class="card-footer clearfix">
+                    <strong>Tags:</strong> @String.Join(", ", Model.Tags.Select(t => t.Name))
+                    <span class="float-right">@Model.DateUploaded.Date.ToShortDateString()</span>
+                </div>
+            }
+        </div>
+    </div>
+</div>

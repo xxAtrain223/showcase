@@ -26,16 +26,12 @@
     </div>
     <input asp-for="Id" type="hidden" />
     <div class="form-row mb-3">
-        <div class="col-12">
-            <div class="form-row">
-                <div class="col-1">
-                    <label asp-for="Title" class="col-form-label"></label>
-                </div>
-                <div class="col-11">
-                    <input asp-for="Title" class="form-control" />
-                    <span asp-validation-for="Title" class="text-danger"></span>
-                </div>
-            </div>
+        <div class="col-1">
+            <label asp-for="Title" class="col-form-label"></label>
+        </div>
+        <div class="col-11">
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
         </div>
     </div>
     <div class="form-row">

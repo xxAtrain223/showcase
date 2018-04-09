@@ -4,24 +4,30 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using showcase.Data;
 using showcase.Models;
 
 namespace showcase.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly ApplicationDbContext db;
+
+        public HomeController(ApplicationDbContext context)
         {
-            return View();
+            db = context;
         }
 
-        public IActionResult About()
+        public async Task<IActionResult> Index()
         {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
+            return View(await db.BlogEntries
+                .Include(e => e.Image)
+                .Include(e => e.Tags)
+                .Where(e => e.Tags.Any(t => t.Name.ToLower() == "home"))
+                .FirstOrDefaultAsync());
         }
-
+        
         public IActionResult Contact()
         {
             ViewData["Message"] = "Your contact page.";

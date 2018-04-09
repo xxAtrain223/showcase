@@ -1,4 +1,4 @@
-﻿@model List<showcase.Models.PortfolioEntry>
+﻿@model List<showcase.Models.BlogEntry>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,17 +13,21 @@
     </style>
 }
 
-<h1>Portfolio</h1>
+<h1>Blog</h1>
 
-@foreach (PortfolioEntry entry in Model)
+@foreach (BlogEntry entry in Model)
 {
     <div class="card text-dark my-3">
         <div class="card-header">
-            <h2 class="mt-0">@entry.Title - <a asp-action="Show" asp-route-id="@entry.Id">Full Project</a></h2>
+            <h2 class="mt-0">@entry.Title - <a asp-action="Show" asp-route-id="@entry.Id">Full Blog Entry</a></h2>
         </div>
         <div class="card-body clearfix">
             <img asp-for="entry.Image" class="img-thumbnail float-left mr-1 mb-0" />
             @Html.Raw(entry.ShortDescription)
+        </div>
+        <div class="card-footer clearfix">
+            <strong>Tags:</strong> @String.Join(", ", entry.Tags.Select(t => t.Name))
+            <span class="float-right">@entry.DateUploaded.Date.ToShortDateString()</span>
         </div>
     </div>
 }

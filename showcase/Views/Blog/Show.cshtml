@@ -1,0 +1,7 @@
+﻿@model showcase.Models.BlogEntry
+
+@{
+    ViewData["Title"] = Model.Title;
+
+    Html.RenderPartial("_BlogShowPartial", Model);
+}

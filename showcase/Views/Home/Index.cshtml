@@ -1,22 +1,16 @@
-﻿@{
+﻿@model showcase.Models.BlogEntry
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="row">
-    <div class="col-8">
-        <div class="card text-dark">
-            <div class="card-header">
-                <h1>Anthony Stewart</h1>
-            </div>
-            <div class="card-body">
-                <p>A really cool guy.</p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. <a href="http://loripsum.net/" target="_blank">Pugnant Stoici cum Peripateticis.</a> Videamus animi partes, quarum est conspectus illustrior; <b>Illud non continuo, ut aeque incontentae.</b> Habent enim et bene longam et satis litigiosam disputationem. <a href="http://loripsum.net/" target="_blank">Illi enim inter se dissentiunt.</a> Qualem igitur hominem natura inchoavit? </p>
-                <p><a href="http://loripsum.net/" target="_blank">Nunc haec primum fortasse audientis servire debemus.</a> Sed ad illum redeo. <b>Sit enim idem caecus, debilis.</b> Tum Piso: Quoniam igitur aliquid omnes, quid Lucius noster? <b>Aliter enim explicari, quod quaeritur, non potest.</b> A quibus propter discendi cupiditatem videmus ultimas terras esse peragratas. <mark>Quid adiuvas?</mark> <b>Quid dubitas igitur mutare principia naturae?</b> </p>
-                <p><mark>Duo Reges: constructio interrete.</mark> Itaque haec cum illis est dissensio, cum Peripateticis nulla sane. Facillimum id quidem est, inquam. Mihi quidem Homerus huius modi quiddam vidisse videatur in iis, quae de Sirenum cantibus finxerit. Erat enim Polemonis. </p>
-            </div>
-        </div>
+@if (Model != null)
+{
+    Html.RenderPartial("_BlogShowPartial", Model);
+}
+else
+{
+    <div class="alert alert-danger">
+        <h1>No Blog Entry with a "home" tag</h1>
     </div>
-    <div class="col-4">
-        <img id="profilePicture" class="img-fluid rounded w-100" src="~/images/profilePicture.jpg" />
-    </div>
-</div>
+}

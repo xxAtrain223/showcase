@@ -15,6 +15,8 @@ namespace showcase.Data
         public DbSet<Resume> Resumes { get; set; }
         public DbSet<PortfolioEntry> PortfolioEntries { get; set; }
         public DbSet<Image> Images { get; set; }
+        public DbSet<BlogEntry> BlogEntries { get; set; }
+        public DbSet<Tag> Tags { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

@@ -15,6 +15,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using AspNetCore.IServiceCollection.AddIUrlHelper;
+using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
+using showcase;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace showcase
 {
@@ -121,9 +125,20 @@ namespace showcase
                     defaults: new { controller = "Portfolio", action = "Show", id = (int?)null, title = String.Empty });
 
                 routes.MapRoute(
+                    name: "BlogTitle",
+                    template: "Blog/Show/{title:alpha}",
+                    defaults: new { controller = "Blog", action = "Show", id = (int?)null, title = String.Empty });
+
+                routes.MapRoute(
+                    name: "BlogId",
+                    template: "Blog/Show/{id:int?}",
+                    defaults: new { controller = "Blog", action = "Show", id = (int?)null, title = String.Empty });
+
+                routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+                    template: "{controller}/{action}/{id?}",
+                    defaults: new { controller = "Home", action = "Index" });
+            });   
         }
     }
 }
