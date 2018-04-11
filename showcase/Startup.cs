@@ -19,6 +19,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using showcase;
 using Microsoft.AspNetCore.Rewrite;
+using PaulMiami.AspNetCore.Mvc.Recaptcha;
 
 namespace showcase
 {
@@ -80,6 +81,12 @@ namespace showcase
                 .AddSessionStateTempDataProvider();
 
             services.AddSession();
+
+            services.AddRecaptcha(new RecaptchaOptions
+            {
+                SiteKey = Configuration["Recaptcha:SiteKey"],
+                SecretKey = Configuration["Recaptcha:SecretKey"]
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

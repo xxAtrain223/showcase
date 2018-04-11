@@ -1,17 +1,67 @@
-﻿@{
+﻿@model showcase.Models.HomeViewModels.ContactViewModel
+@addTagHelper *, PaulMiami.AspNetCore.Mvc.Recaptcha
+@{
     ViewData["Title"] = "Contact";
 }
-<h2>@ViewData["Title"]</h2>
-<h3>@ViewData["Message"]</h3>
 
-<address>
-    One Microsoft Way<br />
-    Redmond, WA 98052-6399<br />
-    <abbr title="Phone">P:</abbr>
-    425.555.0100
-</address>
+<h1>Contact Me</h1>
 
-<address>
-    <strong>Support:</strong> <a href="mailto:Support@example.com">Support@example.com</a><br />
-    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-</address>
+<div class="card my-3 text-dark">
+    <div class="card-header">
+        <h2>Email Using Form</h2>
+    </div>
+    <div class="card-body">
+        <form action="Contact" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-sm-12 col-md-6">
+                    <label asp-for="Name"></label>
+                    <input asp-for="Name" placeholder="@Html.DisplayNameFor(m => m.Name)" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group col-sm-12 col-md-6">
+                    <label asp-for="EmailAddress"></label>
+                    <input asp-for="EmailAddress" placeholder="@Html.DisplayNameFor(m => m.EmailAddress)" class="form-control" />
+                    <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-12">
+                    <label asp-for="Message"></label>
+                    <textarea asp-for="Message" placeholder="@Html.DisplayNameFor(m => m.Message)" class="form-control" rows="5"></textarea>
+                    <span asp-validation-for="Message" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-check mb-3">
+                <input asp-for="SendCopy" class="form-check-input" />
+                <label asp-for="SendCopy" class="form-check-label"></label>
+                <span asp-validation-for="SendCopy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <recaptcha />
+                <span id="recaptchaErrorMessage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary" value="Submit" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card my-3 text-dark">
+    <div class="card-header">
+        <h2>Email Directly</h2>
+    </div>
+    <div class="card-body">
+        <iframe src="@Url.Action("ShowEmail")" style="border: none; width: 100%; height: 175px;"></iframe>
+    </div>
+</div>
+
+@section scripts {
+    @Html.Partial("_ValidationScriptsPartial.cshtml")
+    <recaptcha-script validation-message-element-id="recaptchaErrorMessage" />
+}

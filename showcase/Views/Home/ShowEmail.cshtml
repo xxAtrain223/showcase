@@ -1,0 +1,42 @@
+﻿@addTagHelper *, PaulMiami.AspNetCore.Mvc.Recaptcha
+@{
+    ViewData["Title"] = "Show Email";
+    Layout = null;
+}
+
+<html>
+<head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" />
+</head>
+<body>
+    <div class="m-1">
+        @if (String.IsNullOrWhiteSpace(ViewData["EmailAddress"] as string))
+        {
+            <form asp-action="ShowEmail" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="form-group">
+                    <recaptcha data-val="true" />
+                    <span id="recaptchaErrorMessage2" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Show Email" class="btn btn-primary" />
+                </div>
+            </form>
+
+
+        }
+        else
+        {
+            <a href="mailto:@ViewData["EmailAddress"]" target="_top">@ViewData["EmailDisplay"]</a>
+        }
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="~/js/jquery-validation.js"></script>
+    <recaptcha-script validation-message-element-id="recaptchaErrorMessage2" />
+</body>
+</html>

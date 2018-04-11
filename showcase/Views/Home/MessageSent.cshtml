@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "MessageSent";
+    string ContactEmail = Context.Session.Get<string>("ContactEmail");
+}
+
+<h1>Message Sent</h1>
+
+@if (!String.IsNullOrWhiteSpace(ContactEmail))
+{
+    <p>You'll receive a copy of the email at <strong>@ContactEmail</strong>.</p>
+}
