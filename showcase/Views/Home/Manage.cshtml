@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<a asp-controller="Resumes" asp-action="Manage" class="btn btn-primary">Manage Resumes</a>
+@*<a asp-controller="Portfolio" asp-action="Manage" class="btn btn-primary">Manage Portfolio</a>
+<a asp-controller="Blog" asp-action="Manage" class="btn btn-primary">Manage Blog</a>*@
+<a asp-controller="Image" asp-action="Manage" class="btn btn-primary">Manage Images</a>
+
+@if (ViewData["HomeBlogId"] != null)
+{
+    <a asp-controller="Blog" asp-action="Edit" asp-route-id="@ViewData["HomeBlogId"]" class="btn btn-primary">Edit Home Page</a>
+}
+else
+{
+    <a asp-controller="Blog" asp-action="Create" class="btn btn-success">Create Home Page</a>
+}

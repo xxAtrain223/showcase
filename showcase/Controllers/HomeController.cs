@@ -130,6 +130,19 @@ namespace showcase.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Manage()
+        {
+            BlogEntry entry = await db.BlogEntries
+                .Include(e => e.Tags)
+                .Where(e => e.Tags.Any(t => t.Name.ToLower() == "home"))
+                .FirstOrDefaultAsync();
+
+            ViewData["HomeBlogId"] = entry?.Id;
+
+            return View();
+        }
+
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
