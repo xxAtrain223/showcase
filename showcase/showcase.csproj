@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\src\images\Logos\**" />
+    <Content Remove="wwwroot\src\images\Logos\**" />
+    <EmbeddedResource Remove="wwwroot\src\images\Logos\**" />
+    <None Remove="wwwroot\src\images\Logos\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Data\Migrations\20180206051018_AddResumeModels.cs" />
     <Compile Remove="Data\Migrations\20180206051018_AddResumeModels.Designer.cs" />
     <Compile Remove="Data\Migrations\20180206051342_AddResumeModels.cs" />

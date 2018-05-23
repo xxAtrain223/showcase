@@ -1,0 +1,42 @@
+﻿@import "../../lib/bootstrap/scss/_functions.scss";
+@import "../../lib/bootstrap/scss/_variables.scss";
+@import "../../lib/bootstrap/scss/mixins/_gradients.scss";
+@import "../../lib/bootstrap/scss/mixins/_box-shadow.scss";
+@import "../../lib/bootstrap/scss/mixins/_hover.scss";
+@import "../../lib/bootstrap/scss/mixins/_buttons.scss";
+
+.LoginButton {
+    
+}
+
+.LoginButton {
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.LoginButton svg {
+    height: 1.5em;
+    width: 1.5em;
+    fill: #fff;
+}
+
+.LoginButton span {
+    margin-left: 0.75rem;
+}
+
+.btn-facebook {
+    @include button-variant(#3B5998, #3B5998);
+}
+
+.btn-twitter {
+    @include button-variant(#1DA1F2, #1DA1F2);
+}
+
+.btn-google {
+    @include button-variant(#4285F4, #4285F4);
+}
+
+.btn-microsoft {
+    @include button-variant(#666666, #666666);
+}

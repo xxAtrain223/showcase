@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Mvc;
 using showcase;
 using Microsoft.AspNetCore.Rewrite;
 using PaulMiami.AspNetCore.Mvc.Recaptcha;
+using Microsoft.AspNetCore.Authentication;
 
 namespace showcase
 {
@@ -41,7 +42,7 @@ namespace showcase
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
-
+            
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings
@@ -87,6 +88,13 @@ namespace showcase
                 SiteKey = Configuration["Recaptcha:SiteKey"],
                 SecretKey = Configuration["Recaptcha:SecretKey"]
             });
+
+            services.AddAuthentication().AddExternalAuthentications(Configuration.GetSection("Authentication"));
+            //services.AddAuthentication().AddFacebook(options =>
+            //{
+            //    options.AppId = Configuration["Authentication:Facebook:AppId"];
+            //    options.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -142,10 +150,91 @@ namespace showcase
                     defaults: new { controller = "Blog", action = "Show", id = (int?)null, title = String.Empty });
 
                 routes.MapRoute(
+                    name: "Login",
+                    template: "Login",
+                    defaults: new { controller = "Account", action = "Login" });
+
+                routes.MapRoute(
                     name: "default",
                     template: "{controller}/{action}/{id?}",
                     defaults: new { controller = "Home", action = "Index" });
             });   
+        }
+    }
+
+    public static class AuthenticationBuilderExtensions
+    {
+        public static AuthenticationBuilder AddFacebook(this AuthenticationBuilder builder, IConfigurationSection section)
+        {
+            if (section.Exists())
+            {
+                builder.AddFacebook(options =>
+                {
+                    options.AppId = section["AppId"];
+                    options.AppSecret = section["AppSecret"];
+                });
+            }
+
+            return builder;
+        }
+
+        public static AuthenticationBuilder AddTwitter(this AuthenticationBuilder builder, IConfigurationSection section)
+        {
+            if (section.Exists())
+            {
+                builder.AddTwitter(options =>
+                {
+                    options.ConsumerKey = section["ConsumerKey"];
+                    options.ConsumerSecret = section["ConsumerSecret"];
+                });
+            }
+
+            return builder;
+        }
+
+        public static AuthenticationBuilder AddGoogle(this AuthenticationBuilder builder, IConfigurationSection section)
+        {
+            if (section.Exists())
+            {
+                builder.AddGoogle(options =>
+                {
+                    options.ClientId = section["ClientId"];
+                    options.ClientSecret = section["ClientSecret"];
+                });
+            }
+
+            return builder;
+        }
+
+        public static AuthenticationBuilder AddMicrosoftAccount(this AuthenticationBuilder builder, IConfigurationSection section)
+        {
+            if (section.Exists())
+            {
+                builder.AddMicrosoftAccount(options =>
+                {
+                    options.ClientId = section["ClientId"];
+                    options.ClientSecret = section["ClientSecret"];
+                });
+            }
+
+            return builder;
+        }
+
+        public static AuthenticationBuilder AddExternalAuthentications(this AuthenticationBuilder builder, IConfigurationSection authSection)
+        {
+            if (!authSection.Exists())
+            {
+                return builder;
+            }
+            
+            builder
+                .AddFacebook(authSection.GetSection("Facebook"))
+                .AddTwitter(authSection.GetSection("Twitter"))
+                .AddGoogle(authSection.GetSection("Google"))
+                .AddMicrosoftAccount(authSection.GetSection("Microsoft"));
+            
+
+            return builder;
         }
     }
 }

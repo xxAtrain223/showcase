@@ -87,5 +87,15 @@
             "enabled": true,
             "renameLocals": true
         }
+    },
+    {
+        "outputFileName": "wwwroot/css/LoginButtons.css",
+        "inputFiles": [
+            "wwwroot/src/css/LoginButtons.css"
+        ],
+        "minify": {
+            "enabled": true,
+            "renameLocals": true
+        }
     }
 ]

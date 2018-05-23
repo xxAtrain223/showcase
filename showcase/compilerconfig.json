@@ -6,5 +6,9 @@
   {
     "outputFile": "wwwroot/src/css/BootstrapAddons.css",
     "inputFile": "wwwroot/src/css/BootstrapAddons.scss"
+  },
+  {
+    "outputFile": "wwwroot/src/css/LoginButtons.css",
+    "inputFile": "wwwroot/src/css/LoginButtons.scss"
   }
 ]

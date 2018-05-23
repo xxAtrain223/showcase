@@ -9,7 +9,12 @@
     ViewData["Title"] = "Log in";
 }
 
+@section head {
+    <link rel="stylesheet" href="~/css/LoginButtons.css" />
+}
+
 <h2>@ViewData["Title"]</h2>
+
 <div class="row">
     <div class="col-md-4">
         <section>
@@ -67,14 +72,24 @@
                 else
                 {
                     <form asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in loginProviders)
-                                {
-                                    <button type="submit" class="btn btn-default" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.Name</button>
-                                }
-                            </p>
-                        </div>
+                        @{
+                            if (loginProviders.Any(l => l.Name == "Facebook"))
+                            {
+                                await Html.RenderPartialAsync("LoginButtons/Facebook");
+                            }
+                            if (loginProviders.Any(l => l.Name == "Twitter"))
+                            {
+                                await Html.RenderPartialAsync("LoginButtons/Twitter");
+                            }
+                            if (loginProviders.Any(l => l.Name == "Google"))
+                            {
+                                await Html.RenderPartialAsync("LoginButtons/Google");
+                            }
+                            if (loginProviders.Any(l => l.Name == "Microsoft"))
+                            {
+                                await Html.RenderPartialAsync("LoginButtons/Microsoft");
+                            }
+                        }
                     </form>
                 }
             }
