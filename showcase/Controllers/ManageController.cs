@@ -16,8 +16,7 @@ using showcase.Services;
 
 namespace showcase.Controllers
 {
-    [Authorize]
-    [Route("[controller]/[action]")]
+    [Authorize(Policy = Policies.ManagementIpWhitelist)]
     public class ManageController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

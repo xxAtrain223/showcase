@@ -21,9 +21,18 @@ using showcase;
 using Microsoft.AspNetCore.Rewrite;
 using PaulMiami.AspNetCore.Mvc.Recaptcha;
 using Microsoft.AspNetCore.Authentication;
+using showcase.Auth;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace showcase
 {
+    public static class Policies
+    {
+        public const string ManagementIpWhitelist = "ManagementIpWhitelist";
+        public const string ManagementIpWhitelistAllowAnonymous = "ManagementIpWhitelistAllowAnonymous";
+    }
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -59,7 +68,7 @@ namespace showcase
                 options.Lockout.AllowedForNewUsers = true;
 
                 // User settings
-                options.User.RequireUniqueEmail = true;
+                
             });
 
             services.ConfigureApplicationCookie(options =>
@@ -67,9 +76,9 @@ namespace showcase
                 // Cookie settings
                 options.Cookie.HttpOnly = true;
                 options.Cookie.Expiration = TimeSpan.FromDays(150);
-                options.LoginPath = "/Account/Login"; // If the LoginPath is not set here, ASP.NET Core will default to /Account/Login
-                options.LogoutPath = "/Account/Logout"; // If the LogoutPath is not set here, ASP.NET Core will default to /Account/Logout
-                options.AccessDeniedPath = "/Account/AccessDenied"; // If the AccessDeniedPath is not set here, ASP.NET Core will default to /Account/AccessDenied
+                options.LoginPath = "/Account/AccessDenied"; // "/Account/Login";
+                options.LogoutPath = "/Account/Logout";
+                options.AccessDeniedPath = "/Account/AccessDenied";
                 options.SlidingExpiration = true;
             });
 
@@ -90,11 +99,18 @@ namespace showcase
             });
 
             services.AddAuthentication().AddExternalAuthentications(Configuration.GetSection("Authentication"));
-            //services.AddAuthentication().AddFacebook(options =>
-            //{
-            //    options.AppId = Configuration["Authentication:Facebook:AppId"];
-            //    options.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
-            //});
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Policies.ManagementIpWhitelist, policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.AddRequirements(new IpRequirement(Configuration.GetSection("Management:IpWhitelist")));
+                });
+
+                options.AddPolicy(Policies.ManagementIpWhitelistAllowAnonymous, policy =>
+                    policy.AddRequirements(new IpRequirement(Configuration.GetSection("Management:IpWhitelist"))));
+            }).AddSingleton<IAuthorizationHandler, IpHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -222,18 +238,15 @@ namespace showcase
 
         public static AuthenticationBuilder AddExternalAuthentications(this AuthenticationBuilder builder, IConfigurationSection authSection)
         {
-            if (!authSection.Exists())
+            if (authSection.Exists())
             {
-                return builder;
+                builder
+                    .AddFacebook(authSection.GetSection("Facebook"))
+                    .AddTwitter(authSection.GetSection("Twitter"))
+                    .AddGoogle(authSection.GetSection("Google"))
+                    .AddMicrosoftAccount(authSection.GetSection("Microsoft"));
             }
             
-            builder
-                .AddFacebook(authSection.GetSection("Facebook"))
-                .AddTwitter(authSection.GetSection("Twitter"))
-                .AddGoogle(authSection.GetSection("Google"))
-                .AddMicrosoftAccount(authSection.GetSection("Microsoft"));
-            
-
             return builder;
         }
     }

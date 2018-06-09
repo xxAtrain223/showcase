@@ -13,6 +13,7 @@ using System.Net.Mail;
 using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Configuration;
+using Microsoft.AspNetCore.Authorization;
 
 namespace showcase.Controllers
 {
@@ -30,7 +31,7 @@ namespace showcase.Controllers
         public string Username { get; set; }
         public string Password { get; set; }
     }
-
+    
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext db;
@@ -41,7 +42,7 @@ namespace showcase.Controllers
             db = context;
             config = configuration;
         }
-
+        
         public async Task<IActionResult> Index()
         {
             return View(await db.BlogEntries
