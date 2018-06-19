@@ -84,6 +84,7 @@ namespace showcase
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
+            services.AddSingleton<ApplicationSettings>();
             
             services.AddUrlHelper();
             

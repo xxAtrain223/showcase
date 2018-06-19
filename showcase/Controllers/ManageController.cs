@@ -13,11 +13,12 @@ using Microsoft.Extensions.Options;
 using showcase.Models;
 using showcase.Models.ManageViewModels;
 using showcase.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace showcase.Controllers
 {
     [Authorize(Policy = Policies.ManagementIpWhitelist)]
-    public class ManageController : Controller
+    public class ManageController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -33,7 +34,9 @@ namespace showcase.Controllers
           SignInManager<ApplicationUser> signInManager,
           IEmailSender emailSender,
           ILogger<ManageController> logger,
-          UrlEncoder urlEncoder)
+          UrlEncoder urlEncoder,
+          ApplicationSettings settings)
+            : base(settings)
         {
             _userManager = userManager;
             _signInManager = signInManager;

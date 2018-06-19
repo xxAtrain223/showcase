@@ -12,15 +12,17 @@ using Microsoft.EntityFrameworkCore;
 using showcase.Data;
 using showcase.Models;
 using showcase.UtilityFunctions;
+using Microsoft.Extensions.Configuration;
 
 namespace showcase.Controllers
 {
-    public class ImageController : Controller
+    public class ImageController : ControllerBase
     {
         private readonly ApplicationDbContext db;
         private readonly IHostingEnvironment env;
 
-        public ImageController(ApplicationDbContext context, IHostingEnvironment environment)
+        public ImageController(ApplicationDbContext context, IHostingEnvironment environment, ApplicationSettings settings)
+            : base(settings)
         {
             db = context;
             env = environment;

@@ -17,7 +17,7 @@ using showcase.Services;
 namespace showcase.Controllers
 {
     [Authorize(Policy = Policies.ManagementIpWhitelistAllowAnonymous)]
-    public class AccountController : Controller
+    public class AccountController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -28,7 +28,9 @@ namespace showcase.Controllers
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger,
+            ApplicationSettings settings)
+            : base(settings)
         {
             _userManager = userManager;
             _signInManager = signInManager;

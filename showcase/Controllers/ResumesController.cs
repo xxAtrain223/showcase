@@ -16,15 +16,17 @@ using showcase.Models;
 using showcase.Models.ResumesViewModels;
 using Newtonsoft.Json;
 using showcase.UtilityFunctions;
+using Microsoft.Extensions.Configuration;
 
 namespace showcase.Controllers
 {
-    public class ResumesController : Controller
+    public class ResumesController : ControllerBase
     {
         private readonly ApplicationDbContext db;
         private readonly IHostingEnvironment env;
 
-        public ResumesController(ApplicationDbContext context, IHostingEnvironment environment)
+        public ResumesController(ApplicationDbContext context, IHostingEnvironment environment, ApplicationSettings settings)
+            : base(settings)
         {
             db = context;
             env = environment;

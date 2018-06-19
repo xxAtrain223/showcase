@@ -14,12 +14,13 @@ using showcase.UtilityFunctions;
 
 namespace showcase.Controllers
 {
-    public class BlogController : Controller
+    public class BlogController : ControllerBase
     {
         private readonly ApplicationDbContext db;
         private readonly IHostingEnvironment env;
 
-        public BlogController(ApplicationDbContext context, IHostingEnvironment environment)
+        public BlogController(ApplicationDbContext context, IHostingEnvironment environment, ApplicationSettings settings)
+            : base(settings)
         {
             db = context;
             env = environment;

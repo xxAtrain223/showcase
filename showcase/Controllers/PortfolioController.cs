@@ -13,15 +13,17 @@ using showcase.Models.PortfolioViewModels;
 using System.Net;
 using System.Text.RegularExpressions;
 using showcase.UtilityFunctions;
+using Microsoft.Extensions.Configuration;
 
 namespace showcase.Controllers
 {
-    public class PortfolioController : Controller
+    public class PortfolioController : ControllerBase
     {
         private readonly ApplicationDbContext db;
         private readonly IHostingEnvironment env;
 
-        public PortfolioController(ApplicationDbContext context, IHostingEnvironment environment)
+        public PortfolioController(ApplicationDbContext context, IHostingEnvironment environment, ApplicationSettings settings)
+            : base(settings)
         {
             db = context;
             env = environment;

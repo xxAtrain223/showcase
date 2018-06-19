@@ -14,33 +14,20 @@ using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Configuration;
 using Microsoft.AspNetCore.Authorization;
+using showcase.Services;
 
 namespace showcase.Controllers
 {
-    public class Contact
-    {
-        public string Email { get; set; }
-        public string Name { get; set; }
-        public SmtpServer SmtpServer { get; set; }
-    }
-
-    public class SmtpServer
-    {
-        public string Host { get; set; }
-        public int Port { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
-    
-    public class HomeController : Controller
+    public class HomeController : ControllerBase
     {
         private readonly ApplicationDbContext db;
-        private readonly IConfiguration config;
+        private readonly IEmailSender EmailSender;
 
-        public HomeController(ApplicationDbContext context, IConfiguration configuration)
+        public HomeController(ApplicationDbContext context, ApplicationSettings settings, IEmailSender emailSender)
+            : base(settings)
         {
             db = context;
-            config = configuration;
+            EmailSender = emailSender;
         }
         
         public async Task<IActionResult> Index()
@@ -54,7 +41,7 @@ namespace showcase.Controllers
         
         public IActionResult Contact()
         {
-            ViewData["SmtpServerAvailable"] = config.GetSection("Contact:SmtpServer").GetChildren().Count() > 0;
+            ViewData["SmtpServerAvailable"] = ApplicationSettings.Contact?.SmtpServer != null;
             return View();
         }
 
@@ -67,18 +54,7 @@ namespace showcase.Controllers
                 return View(contactViewModel);
             }
 
-            Contact contact = new Contact();
-            config.GetSection("Contact").Bind(contact);
-            
-            SmtpClient client = new SmtpClient
-            {
-                UseDefaultCredentials = false,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Host = contact.SmtpServer.Host,
-                Port = contact.SmtpServer.Port,
-                EnableSsl = true,
-                Credentials = new NetworkCredential(contact.SmtpServer.Username, contact.SmtpServer.Password)
-            };
+            Contact contact = ApplicationSettings.Contact;
 
             MailMessage message = new MailMessage();
             message.From = new MailAddress(contact.Email, contact.Name);
@@ -87,7 +63,7 @@ namespace showcase.Controllers
             message.Subject = "Showcase Contact Form Response from " + contactViewModel.Name;
             message.Body = contactViewModel.Message;
 
-            await client.SendMailAsync(message);
+            await EmailSender.SendEmailAsync(message);
 
             if (contactViewModel.SendCopy)
             {
@@ -98,7 +74,7 @@ namespace showcase.Controllers
                 messageCopy.Subject = "Showcase Contact Form Response from " + contactViewModel.Name;
                 messageCopy.Body = contactViewModel.Message;
 
-                await client.SendMailAsync(messageCopy);
+                await EmailSender.SendEmailAsync(message);
             }
 
             HttpContext.Session.Set("ContactEmail", contactViewModel.EmailAddress);
@@ -125,8 +101,8 @@ namespace showcase.Controllers
         [ActionName("ShowEmail")]
         public IActionResult ShowEmailPost()
         {
-            ViewData["EmailDisplay"] = String.Format("{0} <{1}>", config["Contact:Name"], config["Contact:Email"]);
-            ViewData["EmailAddress"] = config["Contact:Email"];
+            ViewData["EmailDisplay"] = String.Format("{0} <{1}>", ApplicationSettings.Contact.Name, ApplicationSettings.Contact.Email);
+            ViewData["EmailAddress"] = ApplicationSettings.Contact.Email;
 
             return View();
         }
