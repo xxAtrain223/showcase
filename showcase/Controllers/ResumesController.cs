@@ -17,6 +17,7 @@ using showcase.Models.ResumesViewModels;
 using Newtonsoft.Json;
 using showcase.UtilityFunctions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 
 namespace showcase.Controllers
 {
@@ -122,6 +123,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> Upload()
         {
             return View(new ResumeUploadViewModel
@@ -133,6 +135,7 @@ namespace showcase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> Upload([Bind("Category,Company,FormFile,Categories,Companies")]ResumeUploadViewModel resume)
         {
             // Check Category XOR Company
@@ -201,13 +204,15 @@ namespace showcase.Controllers
 
             return RedirectToAction("Uploaded");
         }
-        
+
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult Uploaded()
         {
             Resume newResume = HttpContext.Session.Get<Resume>("NewResume");
             return View(newResume);
         }
 
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult Manage()
         {
             return View();
@@ -216,6 +221,7 @@ namespace showcase.Controllers
         [HttpPost]
         [HttpPut]
         [ActionName("Category")]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult PutCategory(int? id, string name)
         {
             if (String.IsNullOrWhiteSpace(name))
@@ -245,6 +251,7 @@ namespace showcase.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult EditCategoryDescription(int? id, string description)
         {
             if (id == null)
@@ -277,6 +284,7 @@ namespace showcase.Controllers
 
         [HttpGet]
         [ActionName("Category")]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult GetCategory(int? id)
         {
             if (id == null)
@@ -306,6 +314,7 @@ namespace showcase.Controllers
 
         [HttpDelete]
         [ActionName("Category")]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult DeleteCategory(int? id)
         {
             if (id == null)
@@ -330,6 +339,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult GetCategories(int page = 1, int pagesize = 10)
         {
             if (page < 1)
@@ -368,6 +378,7 @@ namespace showcase.Controllers
         [HttpPost]
         [HttpPut]
         [ActionName("Company")]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult PutCompany(int? id, string name)
         {
             if (String.IsNullOrWhiteSpace(name))
@@ -398,6 +409,7 @@ namespace showcase.Controllers
 
         [HttpGet]
         [ActionName("Company")]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult GetCompany(int? id)
         {
             if (id == null)
@@ -427,6 +439,7 @@ namespace showcase.Controllers
 
         [HttpDelete]
         [ActionName("Company")]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult DeleteCompany(int? id)
         {
             if (id == null)
@@ -451,6 +464,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult GetCompanies(int page = 1, int pagesize = 10)
         {
             if (page < 1)
@@ -487,6 +501,7 @@ namespace showcase.Controllers
 
         [HttpDelete]
         [ActionName("Resume")]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult DeleteResume(int? id)
         {
             if (id == null)

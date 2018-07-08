@@ -108,6 +108,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> Manage()
         {
             BlogEntry entry = await db.BlogEntries

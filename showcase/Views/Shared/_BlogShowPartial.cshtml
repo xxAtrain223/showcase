@@ -63,7 +63,10 @@
     }
 }
 
+@if (User.Identity.IsAuthenticated)
+{
 <a asp-action="Edit" asp-controller="Blog" asp-route-id="@Model.Id" class="btn btn-warning mb-3">Edit</a>
+}
 
 @if (Model.TitlePlacement == TitlePlacement.Jumbotron || (Model.Image != null && Model.ImagePlacement == ImagePlacement.Jumbotron))
 {

@@ -13,6 +13,7 @@ using showcase.Data;
 using showcase.Models;
 using showcase.UtilityFunctions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 
 namespace showcase.Controllers
 {
@@ -36,7 +37,7 @@ namespace showcase.Controllers
 
             if (image != null)
             {
-                return Redirect(Url.Content(image.Path));
+                return Redirect(Url.Content(image.Path)); //Physical File?
             }
             else
             {
@@ -64,6 +65,7 @@ namespace showcase.Controllers
         
         [HttpPost]
         //[Authorize]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public JsonResult UploadImage(string Name, string AltText, int CategoryId, IFormFile Image)
         {
             if (ShowcaseUtilities.IsImage(Image))
@@ -96,6 +98,7 @@ namespace showcase.Controllers
             }
         }
 
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> Manage(int pagesize = 10, int page = 1)
         {
             double count = await db.Images.CountAsync();
@@ -110,6 +113,7 @@ namespace showcase.Controllers
         }
 
         // GET: Image/Edit/5
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -132,6 +136,7 @@ namespace showcase.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> Edit([Bind("Id,Name,AltText")] Image image)
         {
             Image currentImage = await db.Images.FindAsync(image.Id);
@@ -156,6 +161,7 @@ namespace showcase.Controllers
         }
 
         // GET: Image/Delete/5
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -175,6 +181,7 @@ namespace showcase.Controllers
         
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             Image image = await db.Images.FindAsync(id);
@@ -190,6 +197,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult Upload()
         {
             return View();
@@ -197,6 +205,7 @@ namespace showcase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> Upload(string Name, string AltText, IFormFile FormFile)
         {
             if (ShowcaseUtilities.IsImage(FormFile))

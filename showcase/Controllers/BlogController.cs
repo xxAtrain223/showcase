@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -68,7 +69,7 @@ namespace showcase.Controllers
             }
 
             // If Logged in (Admin), always show
-            if (entry.ShowOnList == false)
+            if (entry.ShowOnList == false && !User.Identity.IsAuthenticated)
             {
                 return NotFound("Blog Entry is not currently visible");
             }
@@ -77,6 +78,7 @@ namespace showcase.Controllers
         }
         
         [HttpGet]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult Create()
         {
             return View();
@@ -84,6 +86,7 @@ namespace showcase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> Create([Bind("Title,TitlePlacement,ShortDescription,Markdown,Html,ImageId,Image,ImagePlacement,ShowOnList,ShowFooter,Tags")] BlogEntryViewModel entry)
         {
             if (!ModelState.IsValid)
@@ -140,6 +143,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -171,6 +175,7 @@ namespace showcase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> Edit([Bind("Id,Title,TitlePlacement,ShortDescription,Markdown,Html,ImageId,Image,ImagePlacement,ShowOnList,ShowFooter,Tags")] BlogEntryViewModel entry)
         {
             if (entry.Id == null)
@@ -240,6 +245,7 @@ namespace showcase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)

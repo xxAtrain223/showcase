@@ -14,6 +14,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using showcase.UtilityFunctions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 
 namespace showcase.Controllers
 {
@@ -68,6 +69,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public IActionResult Create()
         {
             return View();
@@ -75,6 +77,7 @@ namespace showcase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> Create([Bind("Title,ShortDescription,Markdown,Html,ImageId")] PortfolioEntryViewModel entry)
         {
             if (!ModelState.IsValid)
@@ -110,6 +113,7 @@ namespace showcase.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -140,6 +144,7 @@ namespace showcase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<IActionResult> Edit([Bind("Id,Title,ShortDescription,Markdown,Html,ImageId")] PortfolioEntryViewModel entry)
         {
             if (entry.Id == null)
@@ -186,6 +191,7 @@ namespace showcase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = Policies.ManagementIpWhitelist)]
         public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)
