@@ -25,7 +25,7 @@ namespace showcase.Services
                 UseDefaultCredentials = false,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 Host = smtpServer.Host,
-                Port = smtpServer.Port,
+                Port = (int)smtpServer.Port,
                 EnableSsl = true,
                 Credentials = new NetworkCredential(smtpServer.Username, smtpServer.Password)
             };

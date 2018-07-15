@@ -140,11 +140,11 @@
 </div>
 
 <div class="text-dark">
-    @Html.Partial("~/Views/Image/_SelectUploadImagePartial.cshtml")
+    <partial name="~/Views/Image/_SelectUploadImagePartial.cshtml" />
 </div>
 
 @section scripts {
-    @Html.Partial("_ValidationScriptsPartial.cshtml")
+    <partial name="_ValidationScriptsPartial" />
 
     <script src="~/js/showdown.js"></script>
     <script src="~/js/debounce.js"></script>

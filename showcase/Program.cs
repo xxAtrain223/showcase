@@ -18,6 +18,7 @@ namespace showcase
         {
             var host = BuildWebHost(args);
 
+            /*
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -32,6 +33,7 @@ namespace showcase
                     logger.LogError(ex, "An error occurred while seeding the database.");
                 }
             }
+            */
 
             host.Run();
         }
@@ -42,7 +44,7 @@ namespace showcase
                 {
                     IHostingEnvironment env = builderContext.HostingEnvironment;
 
-                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                         .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
                 })
                 .UseStartup<Startup>()

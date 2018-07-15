@@ -2,6 +2,6 @@
 
 @{
     ViewData["Title"] = Model.Title;
-
-    Html.RenderPartial("_BlogShowPartial", Model);
+    
+    <partial name="_BlogShowPartial" model="Model" />
 }

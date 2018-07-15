@@ -47,7 +47,7 @@ namespace showcase.Controllers
 
         [HttpPost]
         [ValidateRecaptcha]
-        public async Task<IActionResult> Contact([Bind("Name,EmailAddress,Message,SendCopy")] ContactViewModel contactViewModel)
+        public async Task<IActionResult> Contact([Bind("Name,EmailAddress,Message,SendCopy")] Models.HomeViewModels.ContactViewModel contactViewModel)
         {
             if (!ModelState.IsValid)
             {

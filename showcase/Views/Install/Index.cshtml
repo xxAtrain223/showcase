@@ -1,6 +1,307 @@
-﻿@{
+﻿@model showcase.Models.InstallationViewModel
+@using Microsoft.Extensions.Logging;
+@{
     ViewData["Title"] = "Install";
 }
 
-<h2>Showcase Install</h2>
+@section head {
+    <style>
+        input.form-control {
+            font-family: 'Courier New', Courier, monospace;
+        }
 
+        td {
+            padding-right: 5px;
+        }
+    </style>
+}
+
+<h1>Showcase Installation</h1>
+
+<form asp-action="Index">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="card mb-3 text-dark">
+        <div class="card-body">
+            <h3>Database</h3>
+            <div class="row mb-3">
+                <div class="col-lg-2">
+                    <label asp-for="ConnectionString" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <div class="input-group">
+                        <input asp-for="ConnectionString" class="form-control" />
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary" type="button" id="testConnectionString">Test</button>
+                        </div>
+                    </div>
+                    <span asp-validation-for="ConnectionString" class="text-danger"></span>
+                </div>
+            </div>
+            <h3>Logging</h3>
+            <div class="row mb-4">
+                <div class="col-lg-2">
+                    <label asp-for="Logging.Default" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-4">
+                    <select asp-for="Logging.Default" asp-items="Html.GetEnumSelectList<LogLevel>().Select(e => { e.Selected = e.Value == ((int)LogLevel.Warning).ToString(); return e; })" class="form-control"></select>
+                    <span asp-validation-for="Logging.Default" class="text-danger"></span>
+                </div>
+                <div clasas="col">
+                    <label asp-for="Logging.IncludeScopes" class="col-form-label">
+                        @Html.DisplayNameFor(l => l.Logging.IncludeScopes)
+                        <input asp-for="Logging.IncludeScopes" type="checkbox" style="vertical-align: middle; margin-left: 0.25rem;" />
+                    </label>
+                    <span asp-validation-for="Logging.IncludeScopes" class="text-danger"></span>
+                </div>
+            </div>
+            <h3>Management Whitelist</h3>
+            <p>Use this to restrict access to the management pages. Here are some examples.</p>
+            <table class="mb-3">
+                <tr>
+                    <td><code>*</code></td>
+                    <td>Allow any IP address.</td>
+                </tr>
+                <tr>
+                    <td><code>192.168.1.*</code></td>
+                    <td>Allow these IP addresses <code>192.168.1.0 - 192.168.1.255</code></td>
+                </tr>
+                <tr>
+                    <td><code>192.168.1.42</code></td>
+                    <td>Only allow <code>192.168.1.42</code></td>
+                </tr>
+                <tr>
+                    <td><code>192.168.1.42, 192.168.1.49</code></td>
+                    <td>Only allow <code>192.168.1.42</code> or <code>192.168.1.49</code></td>
+                </tr>
+            </table>
+            <div class="row">
+                <div class="col-lg-2">
+                    <label asp-for="IpWhitelist" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="IpWhitelist" class="form-control" type="text" />
+                    <span asp-validation-for="IpWhitelist" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3 text-dark">
+        <div class="card-header">
+            <h2>Recaptcha</h2>
+        </div>
+        <div class="card-body">
+            <p>Recaptcha is used to help prevent bots from getting your contact information and submitting spam. Go to <a href="https://www.google.com/recaptcha/admin">Google's Recaptcha Admin page</a> and setup a new site to get your Site Key and Secret Key.</p>
+            <div class="row mb-3">
+                <div class="col-lg-2">
+                    <label asp-for="Recaptcha.SiteKey" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Recaptcha.SiteKey" class="form-control" type="text" />
+                    <span asp-validation-for="Recaptcha.SiteKey" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2">
+                    <label asp-for="Recaptcha.SecretKey" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Recaptcha.SecretKey" class="form-control" type="text" />
+                    <span asp-validation-for="Recaptcha.SecretKey" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3 text-dark">
+        <div class="card-header">
+            <h2>Contact</h2>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-lg-2">
+                    <label asp-for="Contact.Name" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Contact.Name" class="form-control" type="text" />
+                    <span asp-validation-for="Contact.Name" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-lg-2">
+                    <label asp-for="Contact.Email" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Contact.Email" class="form-control" type="text" />
+                    <span asp-validation-for="Contact.Email" class="text-danger"></span>
+                </div>
+            </div>
+            <h3>SMTP Server</h3>
+            <p>This is used for the contact form.</p>
+            <div class="row mb-3">
+                <div class="col-lg-2">
+                    <label asp-for="Contact.SmtpServer.Host" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Contact.SmtpServer.Host" class="form-control" type="text" />
+                    <span asp-validation-for="Contact.SmtpServer.Host" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-lg-2">
+                    <label asp-for="Contact.SmtpServer.Port" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Contact.SmtpServer.Port" class="form-control" type="number" />
+                    <span asp-validation-for="Contact.SmtpServer.Port" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-lg-2">
+                    <label asp-for="Contact.SmtpServer.Username" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Contact.SmtpServer.Username" class="form-control" type="text" />
+                    <span asp-validation-for="Contact.SmtpServer.Username" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2">
+                    <label asp-for="Contact.SmtpServer.Password" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Contact.SmtpServer.Password" class="form-control" type="text" />
+                    <span asp-validation-for="Contact.SmtpServer.Password" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3 text-dark">
+        <div class="card-header">
+            <h2>External Authentication</h2>
+        </div>
+        <div class="card-body">
+            <p>Using external authentication allows you to not store your passwords on the server.</p>
+            <h3>Facebook</h3>
+            <p>Follow <a href="https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social/facebook-logins?view=aspnetcore-2.1&tabs=aspnetcore2x">these instructions</a> to setup external authentication with Facebook and get your App Id and App Secret.</p>
+            <div class="row mb-3">
+                <div class="col-lg-2">
+                    <label asp-for="Authentication.Facebook.AppId" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Authentication.Facebook.AppId" class="form-control" type="text" />
+                    <span asp-validation-for="Authentication.Facebook.AppId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-lg-2">
+                    <label asp-for="Authentication.Facebook.AppSecret" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Authentication.Facebook.AppSecret" class="form-control" type="text" />
+                    <span asp-validation-for="Authentication.Facebook.AppSecret" class="text-danger"></span>
+                </div>
+            </div>
+            <h3>Twitter</h3>
+            <p>Follow <a href="https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social/twitter-logins?view=aspnetcore-2.1">these instructions</a> to setup external authentication with Twitter and get your Consumer Key and Consumer Secret.</p>
+            <div class="row mb-3">
+                <div class="col-lg-2">
+                    <label asp-for="Authentication.Twitter.ConsumerKey" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Authentication.Twitter.ConsumerKey" class="form-control" type="text" />
+                    <span asp-validation-for="Authentication.Twitter.ConsumerKey" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-lg-2">
+                    <label asp-for="Authentication.Twitter.ConsumerSecret" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Authentication.Twitter.ConsumerSecret" class="form-control" type="text" />
+                    <span asp-validation-for="Authentication.Twitter.ConsumerSecret" class="text-danger"></span>
+                </div>
+            </div>
+            <h3>Google</h3>
+            <p>Follow <a href="https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social/google-logins?view=aspnetcore-2.1">these instructions</a> to setup external authentication with Google and get your Client Id and Client Secret.</p>
+            <div class="row mb-3">
+                <div class="col-lg-2">
+                    <label asp-for="Authentication.Google.ClientId" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Authentication.Google.ClientId" class="form-control" type="text" />
+                    <span asp-validation-for="Authentication.Google.ClientId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-lg-2">
+                    <label asp-for="Authentication.Google.ClientSecret" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Authentication.Google.ClientSecret" class="form-control" type="text" />
+                    <span asp-validation-for="Authentication.Google.ClientSecret" class="text-danger"></span>
+                </div>
+            </div>
+            <h3>Microsoft</h3>
+            <p>Follow <a href="https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social/microsoft-logins?view=aspnetcore-2.1">these instructions</a> to setup external authentication with Microsoft and get your Client Id and Client Secret.</p>
+            <div class="row mb-3">
+                <div class="col-lg-2">
+                    <label asp-for="Authentication.Microsoft.ClientId" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Authentication.Microsoft.ClientId" class="form-control" type="text" />
+                    <span asp-validation-for="Authentication.Microsoft.ClientId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2">
+                    <label asp-for="Authentication.Microsoft.ClientSecret" class="col-form-label"></label>
+                </div>
+                <div class="col-lg-10">
+                    <input asp-for="Authentication.Microsoft.ClientSecret" class="form-control" type="text" />
+                    <span asp-validation-for="Authentication.Microsoft.ClientSecret" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <input type="submit" value="Install" class="btn btn-primary" />
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(function () {
+            $("#testConnectionString").click(function () {
+                $("#testConnectionString").removeClass("btn-success btn-danger").attr("disabled", "disabled");
+                $("#@(Html.IdFor(m => m.ConnectionString))").removeClass("is-valid is-invalid").attr("disabled", "disabled");
+                $("[data-valmsg-for='@(Html.NameFor(m => m.ConnectionString))']").text("");
+
+                var connectionString = $("#@(Html.IdFor(m => m.ConnectionString))").val();
+
+                $.ajax({
+                    method: "POST",
+                    url: "@Url.Action("TestConnectionString", "Install")",
+                    data: {
+                        connectionString: connectionString
+                    }
+                })
+                .done(function (data, textStatus, jqXHR) {
+                    $("#testConnectionString").addClass("btn-success").removeAttr("disabled");
+                    $("#@(Html.IdFor(m => m.ConnectionString))").addClass("is-valid").removeAttr("disabled");
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    $("#testConnectionString").addClass("btn-danger").removeAttr("disabled");
+                    $("#@(Html.IdFor(m => m.ConnectionString))").addClass("is-invalid").removeAttr("disabled");
+                    $("[data-valmsg-for='@(Html.NameFor(m => m.ConnectionString))']").text(jqXHR.responseText);
+                });
+            });
+        });
+    </script>
+}

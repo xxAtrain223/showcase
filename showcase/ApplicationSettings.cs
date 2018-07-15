@@ -14,12 +14,13 @@ namespace showcase
         public Contact Contact { get; set; }
         public Authentication Authentication { get; set; }
         public Management Management { get; set; }
+        public Logging Logging { get; set; }
         public bool Installed { get; set; }
-
-        public ApplicationSettings(IConfiguration configuration)
+        
+        public ApplicationSettings(IConfiguration configuration = null)
         {
             Configuration = configuration;
-            Configuration.Bind(this);
+            Configuration?.Bind(this);
         }
     }
 
@@ -39,7 +40,7 @@ namespace showcase
     public class SmtpServer
     {
         public string Host { get; set; }
-        public int Port { get; set; }
+        public int? Port { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
     }
@@ -79,5 +80,16 @@ namespace showcase
     public class Management
     {
         public List<string> IpWhitelist { get; set; }
+    }
+
+    public class Logging
+    {
+        public bool IncludeScopes { get; set; }
+        public LogLevel LogLevel { get; set; }
+    }
+
+    public class LogLevel
+    {
+        public string Default { get; set; }
     }
 }
